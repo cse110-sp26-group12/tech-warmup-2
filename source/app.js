@@ -1,10 +1,36 @@
 /**
  * AI Slot Machine - Game Logic
  * Parodying AI culture for Karen, Gary, Sam, Cathy, and Pete.
+ * 
+ * @typedef {Object} GameStats
+ * @property {number} spins - Total number of spins.
+ * @property {number} won - Total tokens won.
+ * @property {number} missions - Number of missions completed.
+ */
+
+/**
+ * @typedef {Object} GameSettings
+ * @property {string} theme - The UI theme name.
+ * @property {number} volume - Sound volume level (0 to 1).
+ */
+
+/**
+ * @typedef {Object} GameState
+ * @property {number} tokens - Current token balance.
+ * @property {number} currentBet - Current bet amount.
+ * @property {number} jackpot - Current jackpot amount.
+ * @property {boolean} isSpinning - Whether the reels are currently spinning.
+ * @property {boolean} autoPlay - Whether auto-play is enabled.
+ * @property {number} lossStreak - Current consecutive losses.
+ * @property {GameStats} stats - Game statistics.
+ * @property {GameSettings} settings - User settings.
  */
 
 // Symbols and Payouts
+/** @type {string[]} */
 const SYMBOLS = ['🤖', '🧠', '💎', '⚡', '📉'];
+
+/** @type {Object<string, number>} */
 const PAYOUTS = {
     '💎': 100, // Top Model
     '🧠': 20,  // Neural Net
@@ -13,7 +39,8 @@ const PAYOUTS = {
     '📉': 0    // Hallucination
 };
 
-// Game State
+// Initial State
+/** @type {GameState} */
 let state = {
     tokens: 1000,
     currentBet: 10,
@@ -45,6 +72,7 @@ const elements = {
     autoBtn: document.getElementById('auto-btn'),
     betBtns: document.querySelectorAll('.bet-btn'),
     maxBetBtn: document.getElementById('max-bet'),
+    addTokensBtn: document.getElementById('add-tokens-btn'),
     logs: document.getElementById('game-logs'),
     statSpins: document.getElementById('stat-spins'),
     statWon: document.getElementById('stat-won'),
@@ -58,35 +86,60 @@ const elements = {
 
 // Audio Setup (Cathy's feedback)
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+/**
+ * Plays a procedural sound.
+ * @param {number} freq - Frequency in Hz.
+ * @param {OscillatorType} [type='sine'] - Oscillator type.
+ * @param {number} [duration=0.1] - Duration in seconds.
+ */
 function playSound(freq, type = 'sine', duration = 0.1) {
     if (state.settings.volume === 0) return;
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = type;
-    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-    gain.gain.setValueAtTime(state.settings.volume, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime + duration);
+    try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(state.settings.volume, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+    } catch (e) {
+        console.warn("Audio playback failed", e);
+    }
 }
 
-// Initialize Reels
+/**
+ * Initializes the reels with a set of symbols for the spinning effect.
+ */
 function initReels() {
     elements.reels.forEach(reel => {
+        if (!reel) return;
         reel.innerHTML = '';
-        // Add many symbols for spinning effect
         for (let i = 0; i < 20; i++) {
-            const sym = document.createElement('div');
-            sym.className = 'symbol';
-            sym.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+            const sym = createSymbolElement();
             reel.appendChild(sym);
         }
     });
 }
 
-// Update UI
+/**
+ * Creates a symbol DOM element.
+ * @param {string} [symbol] - The symbol character.
+ * @returns {HTMLElement}
+ */
+function createSymbolElement(symbol) {
+    const sym = document.createElement('div');
+    sym.className = 'symbol';
+    sym.textContent = symbol || SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+    return sym;
+}
+
+/**
+ * Updates the UI based on current state.
+ */
 function updateUI() {
     elements.tokenBalance.textContent = state.tokens.toLocaleString();
     elements.jackpotTicker.textContent = Math.floor(state.jackpot).toLocaleString();
@@ -95,146 +148,230 @@ function updateUI() {
     elements.statMissions.textContent = `${state.stats.missions}/3`;
 }
 
-// Log Message (Gary's logs)
+/**
+ * Adds a message to the game logs.
+ * @param {string} msg - The message to log.
+ * @param {string} [type=''] - Optional CSS class for styling ('log-win', 'log-loss').
+ */
 function addLog(msg, type = '') {
     const entry = document.createElement('div');
     entry.className = `log-entry ${type}`;
     entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
     elements.logs.prepend(entry);
-    if (elements.logs.childNodes.length > 50) elements.logs.lastChild.remove();
+    if (elements.logs.childNodes.length > 50) {
+        elements.logs.lastChild.remove();
+    }
 }
 
-// Spin Logic
+/**
+ * Core spin logic.
+ */
 async function spin() {
-    if (state.isSpinning || state.tokens < state.currentBet) {
-        if (state.tokens < state.currentBet) {
-            addLog("Insufficient compute credits. Deposit more tokens.", "log-loss");
-            state.autoPlay = false;
-            elements.autoBtn.classList.remove('active');
-        }
+    if (state.isSpinning) return;
+
+    if (state.tokens < state.currentBet || state.currentBet <= 0) {
+        handleInsufficientFunds();
         return;
     }
 
+    startSpinState();
+
+    const results = [];
+    const reelPromises = elements.reels.map((reel, i) => animateReel(reel, i, results));
+
+    await Promise.all(reelPromises);
+    
+    finalizeSpin(results);
+}
+
+/**
+ * Handles cases where user cannot spin due to balance or bet size.
+ */
+function handleInsufficientFunds() {
+    if (state.currentBet <= 0) {
+        addLog("Minimum bet required to run inference.", "log-loss");
+    } else {
+        addLog("Insufficient compute credits. Deposit more tokens.", "log-loss");
+    }
+    state.autoPlay = false;
+    elements.autoBtn.classList.remove('active');
+}
+
+/**
+ * Updates state at the beginning of a spin.
+ */
+function startSpinState() {
     state.isSpinning = true;
     state.tokens -= state.currentBet;
-    state.jackpot += state.currentBet * 0.1; // 10% of bet goes to jackpot (Karen's live jackpot)
+    state.jackpot += state.currentBet * 0.1; // 10% contribution
     state.stats.spins++;
     updateUI();
     playSound(200, 'square', 0.05);
-
     addLog(`Running inference... Bet: ${state.currentBet}`);
+}
 
-    const results = [];
-    const reelPromises = elements.reels.map((reel, i) => {
-        return new Promise(resolve => {
-            const spinDuration = 1000 + (i * 500);
-            const symbolHeight = reel.querySelector('.symbol').clientHeight;
-            const stopIdx = Math.floor(Math.random() * SYMBOLS.length);
-            results.push(SYMBOLS[stopIdx]);
+/**
+ * Animates a single reel.
+ * @param {HTMLElement} reel - The reel element to animate.
+ * @param {number} index - The index of the reel.
+ * @param {string[]} resultsArray - Array to store the result symbol.
+ * @returns {Promise<void>}
+ */
+function animateReel(reel, index, resultsArray) {
+    return new Promise(resolve => {
+        const spinDuration = 1000 + (index * 500);
+        const symbolHeight = reel.querySelector('.symbol').clientHeight;
+        const stopIdx = Math.floor(Math.random() * SYMBOLS.length);
+        const resultSymbol = SYMBOLS[stopIdx];
+        resultsArray.push(resultSymbol);
 
-            const stopHandler = () => {
-                if (state.isSpinning) {
-                    reel.style.transitionDuration = '150ms';
-                    reel.style.transitionTimingFunction = 'ease-out';
-                    addLog(`Manual stop on Reel ${i+1}.`);
-                }
-            };
-            reel.parentElement.addEventListener('click', stopHandler);
+        /**
+         * Local handler for stopping or finishing the transition.
+         */
+        reel.ontransitionend = () => {
+            reel.style.transition = 'none';
+            reel.innerHTML = '';
+            for (let j = 0; j < 20; j++) {
+                const sym = createSymbolElement(j === 1 ? resultSymbol : undefined);
+                reel.appendChild(sym);
+            }
+            reel.style.transform = `translateY(-${symbolHeight}px)`;
+            playSound(400 + (index * 100), 'sine', 0.1);
+            reel.ontransitionend = null;
+            resolve();
+        };
 
-            reel.ontransitionend = () => {
-                reel.parentElement.removeEventListener('click', stopHandler);
-                reel.style.transition = 'none';
-                reel.innerHTML = '';
-                for (let j = 0; j < 20; j++) {
-                    const sym = document.createElement('div');
-                    sym.className = 'symbol';
-                    sym.textContent = j === 1 ? SYMBOLS[stopIdx] : SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-                    reel.appendChild(sym);
-                }
-                reel.style.transform = `translateY(-${symbolHeight}px)`;
-                playSound(400 + (i * 100), 'sine', 0.1);
-                reel.ontransitionend = null;
-                resolve();
-            };
-
-            reel.style.transition = `transform ${spinDuration}ms cubic-bezier(0.45, 0.05, 0.55, 0.95)`;
-            const totalShift = (20 * symbolHeight) + (stopIdx * symbolHeight);
-            reel.style.transform = `translateY(-${totalShift}px)`;
-        });
+        reel.style.transition = `transform ${spinDuration}ms cubic-bezier(0.45, 0.05, 0.55, 0.95)`;
+        const totalShift = (20 * symbolHeight) + (stopIdx * symbolHeight);
+        reel.style.transform = `translateY(-${totalShift}px)`;
     });
+}
 
-    await Promise.all(reelPromises);
+/**
+ * Finalizes the spin results and checks for wins.
+ * @param {string[]} results - The resulting symbols from the spin.
+ */
+function finalizeSpin(results) {
     checkWin(results);
     state.isSpinning = false;
 
     if (state.autoPlay) {
-        setTimeout(spin, 1000);
+        setTimeout(() => {
+            if (state.autoPlay) spin();
+        }, 1000);
     }
 }
 
+/**
+ * Checks for win conditions and updates state/UI.
+ * @param {string[]} results - Resulting symbols.
+ */
 function checkWin(results) {
     const [r1, r2, r3] = results;
     let winAmount = 0;
 
     if (r1 === r2 && r2 === r3) {
-        const basePayout = PAYOUTS[r1];
-        winAmount = basePayout * state.currentBet;
-        
-        // Visual Feedback (Cathy)
-        document.querySelector('.payline').classList.add('active');
-        elements.reels.forEach(reel => {
-            const centerSymbol = reel.querySelectorAll('.symbol')[1];
-            if (centerSymbol) centerSymbol.classList.add('win');
-        });
-
-        if (r1 === '💎') {
-            winAmount += state.jackpot;
-            state.jackpot = 100000;
-            addLog("SINGULARITY ACHIEVED! JACKPOT!", "log-win");
-            document.querySelector('.slot-machine').classList.add('shake');
-            setTimeout(() => document.querySelector('.slot-machine').classList.remove('shake'), 1000);
-        } else {
-            addLog(`Valid alignment: ${r1} x3! Won ${winAmount} tokens.`, "log-win");
-        }
+        winAmount = calculateWin(r1);
+        handleWinUI(r1, winAmount);
     } else {
         addLog("Hallucination detected. No tokens generated.", "log-loss");
     }
 
-    if (winAmount > 0) {
-        state.tokens += winAmount;
-        state.stats.won += winAmount;
-        state.lossStreak = 0;
-        playSound(800, 'triangle', 0.3);
-        
-        // Missions (Gary's missions)
-        if (state.stats.missions < 3) {
-            if (state.stats.spins >= 10 && state.stats.missions === 0) {
-                state.stats.missions = 1;
-                addLog("Mission Accomplished: 10 Inferences Run!", "log-win");
-            }
-            if (winAmount >= 1000 && state.stats.missions === 1) {
-                state.stats.missions = 2;
-                addLog("Mission Accomplished: High-Yield Model Trained!", "log-win");
-            }
-        }
-    } else {
-        state.lossStreak++;
-        if (state.lossStreak >= 5 && state.stats.missions === 2) {
-            state.stats.missions = 3;
-            addLog("Mission Accomplished: Hallucination Researcher (5 losses)!", "log-win");
-        }
-    }
-
-    setTimeout(() => {
-        document.querySelector('.payline').classList.remove('active');
-        document.querySelectorAll('.symbol.win').forEach(s => s.classList.remove('win'));
-    }, 2000);
+    updatePostWinState(winAmount);
+    updateMissions(winAmount);
+    
+    setTimeout(clearWinVisuals, 2000);
 
     updateUI();
     saveState();
 }
 
-// Persistence
+/**
+ * Calculates win amount based on symbol.
+ * @param {string} symbol - The winning symbol.
+ * @returns {number}
+ */
+function calculateWin(symbol) {
+    const basePayout = PAYOUTS[symbol] || 0;
+    let amount = basePayout * state.currentBet;
+    if (symbol === '💎') {
+        amount += state.jackpot;
+    }
+    return amount;
+}
+
+/**
+ * Updates UI and logs for a win.
+ * @param {string} symbol - Winning symbol.
+ * @param {number} winAmount - Amount won.
+ */
+function handleWinUI(symbol, winAmount) {
+    document.querySelector('.payline').classList.add('active');
+    elements.reels.forEach(reel => {
+        const centerSymbol = reel.querySelectorAll('.symbol')[1];
+        if (centerSymbol) centerSymbol.classList.add('win');
+    });
+
+    if (symbol === '💎') {
+        state.jackpot = 100000;
+        addLog("SINGULARITY ACHIEVED! JACKPOT!", "log-win");
+        document.querySelector('.slot-machine').classList.add('shake');
+        setTimeout(() => document.querySelector('.slot-machine').classList.remove('shake'), 1000);
+    } else {
+        addLog(`Valid alignment: ${symbol} x3! Won ${winAmount} tokens.`, "log-win");
+    }
+    playSound(800, 'triangle', 0.3);
+}
+
+/**
+ * Updates tokens and stats after a spin result.
+ * @param {number} winAmount 
+ */
+function updatePostWinState(winAmount) {
+    if (winAmount > 0) {
+        state.tokens += winAmount;
+        state.stats.won += winAmount;
+        state.lossStreak = 0;
+    } else {
+        state.lossStreak++;
+    }
+}
+
+/**
+ * Updates mission progress based on game events.
+ * @param {number} winAmount 
+ */
+function updateMissions(winAmount) {
+    if (state.stats.missions >= 3) return;
+
+    // Mission 1: 10 Spins
+    if (state.stats.spins >= 10 && state.stats.missions === 0) {
+        state.stats.missions = 1;
+        addLog("Mission Accomplished: 10 Inferences Run!", "log-win");
+    }
+    // Mission 2: Win 1000+ tokens
+    if (winAmount >= 1000 && state.stats.missions === 1) {
+        state.stats.missions = 2;
+        addLog("Mission Accomplished: High-Yield Model Trained!", "log-win");
+    }
+    // Mission 3: 5 losses in a row after Mission 2
+    if (state.lossStreak >= 5 && state.stats.missions === 2) {
+        state.stats.missions = 3;
+        addLog("Mission Accomplished: Hallucination Researcher (5 losses)!", "log-win");
+    }
+}
+
+/**
+ * Removes win animations and highlights.
+ */
+function clearWinVisuals() {
+    document.querySelector('.payline').classList.remove('active');
+    document.querySelectorAll('.symbol.win').forEach(s => s.classList.remove('win'));
+}
+
+/**
+ * Saves game state to localStorage.
+ */
 function saveState() {
     localStorage.setItem('ai_slot_state', JSON.stringify({
         tokens: state.tokens,
@@ -244,15 +381,21 @@ function saveState() {
     }));
 }
 
+/**
+ * Loads game state from localStorage.
+ */
 function loadState() {
     const saved = localStorage.getItem('ai_slot_state');
     if (saved) {
-        const parsed = JSON.parse(saved);
-        state = { ...state, ...parsed };
-        updateUI();
-        document.documentElement.setAttribute('data-theme', state.settings.theme);
-        elements.themeSelect.value = state.settings.theme;
-        elements.volumeSlider.value = state.settings.volume;
+        try {
+            const parsed = JSON.parse(saved);
+            state = { ...state, ...parsed };
+            document.documentElement.setAttribute('data-theme', state.settings.theme);
+            elements.themeSelect.value = state.settings.theme;
+            elements.volumeSlider.value = state.settings.volume;
+        } catch (e) {
+            console.error("Failed to load state", e);
+        }
     }
 }
 
@@ -262,21 +405,36 @@ elements.spinBtn.addEventListener('click', spin);
 elements.autoBtn.addEventListener('click', () => {
     state.autoPlay = !state.autoPlay;
     elements.autoBtn.classList.toggle('active', state.autoPlay);
+    addLog(`Auto-bet ${state.autoPlay ? 'enabled' : 'disabled'}.`);
     if (state.autoPlay) spin();
+});
+
+elements.addTokensBtn.addEventListener('click', () => {
+    const refillAmount = 1000;
+    state.tokens += refillAmount;
+    updateUI();
+    saveState();
+    addLog(`Compute grant received: +${refillAmount} tokens.`, "log-win");
+    playSound(600, 'sine', 0.2);
 });
 
 elements.betBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         elements.betBtns.forEach(b => b.classList.remove('active'));
+        elements.maxBetBtn.classList.remove('active');
         btn.classList.add('active');
-        state.currentBet = parseInt(btn.dataset.amount);
+        state.currentBet = parseInt(btn.dataset.amount) || 10;
     });
 });
 
 elements.maxBetBtn.addEventListener('click', () => {
     elements.betBtns.forEach(b => b.classList.remove('active'));
     elements.maxBetBtn.classList.add('active');
-    state.currentBet = Math.min(state.tokens, 1000); // Karen's high bet
+    // Ensure max bet is at least 1 if user has tokens, but capped at 1000
+    state.currentBet = Math.min(state.tokens, 1000);
+    if (state.tokens > 0 && state.currentBet === 0) {
+        state.currentBet = Math.min(state.tokens, 1);
+    }
     addLog(`Going all in: ${state.currentBet} bet set.`);
 });
 
@@ -299,8 +457,12 @@ elements.volumeSlider.addEventListener('input', (e) => {
     saveState();
 });
 
-// Start
-loadState();
-initReels();
-updateUI();
-addLog("Welcome to the AI Token Casino. Connect your GPU to begin.");
+// Initialize App
+function init() {
+    loadState();
+    initReels();
+    updateUI();
+    addLog("Welcome to the AI Token Casino. Connect your GPU to begin.");
+}
+
+init();

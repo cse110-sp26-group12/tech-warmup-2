@@ -73,11 +73,25 @@ the game to my particular tastes.
 **Hand-edits:** None
 --- 
 
-## Iteration 2 — [Short Title]
-**Prompt:** [exact prompt sent]
-**Outcome:** [what the AI produced / what changed]
-**Worked / didn't work:** [brief notes]
-**Hand-edits:** [none / what + why]
+## Iteration 2 — [Fixing Bugs + Clean Code]
+**Prompt:** I have noticed the following errors in the app: There is no way to add more tokens and that you can still bet on 0 when the bet size is set to max and you press auto-optimize. also auto-optimize should be renamed to auto-bet. Also if there is any other bugs or errors in the code fix them. Also make sure the code is Linted: source code should be checked for quality this includes HTML validation, CSS use, and JS style and usage. Documented: Source code must be appropriately document. JavaScript should use JSDocs with type annotations. Clean: Following the principles of clean codeLinks to an external site. you should use:
+
+Meaningful names.
+
+Small functions and classes.
+
+Avoid duplicate code (Don't Repeat Yourself - DRYLinks to an external site.).
+
+Handle errors.
+
+Appropriate abstraction and modularity.
+
+Be easy to update.
+
+Clear code matters more than clever code — the goal is a codebase that reads as if one person wrote the whole thing— not a team of people using an agent(s).
+**Outcome:** Bugs are fixed, able to add tokens and then also able to auto bet and will stop auto betting once reached 0 tokens
+**Worked / didn't work:** Everything works as intended, Code is more clean and strucutres and added JSDoc Documentations with type annotations and more lintina dn standards
+**Hand-edits:** none
 ---
 
 ## Iteration 3 — [Short Title]

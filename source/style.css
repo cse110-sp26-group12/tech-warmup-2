@@ -148,11 +148,28 @@ main {
 }
 
 .tokens-display {
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
     font-size: 1.2rem;
     background: var(--card-bg);
     padding: 10px;
     border-radius: var(--border-radius);
+}
+
+#add-tokens-btn {
+    padding: 2px 8px;
+    background-color: var(--primary-color);
+    color: var(--bg-color);
+    border-radius: 50%;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+#add-tokens-btn:hover {
+    filter: brightness(1.2);
+    transform: scale(1.1);
 }
 
 .bet-controls {
