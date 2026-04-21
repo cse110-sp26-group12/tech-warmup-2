@@ -8,6 +8,6 @@
 <em>As a <strong>strategic gambler</strong>, I want <strong>spin stops</strong> so I can time my rolls and <strong>win money through skill</strong>.</em>
 
 <h3> User Story 4: Casual Cathy</h3>
-<em>As a <strong>casual player</strong>, I want <strong>clear visual and sound feedback</strong> so that I feel and <strong>excited and rewarded</strong>.</em>
+<em>As a <strong>casual player</strong>, I want <strong>clear visual and sound feedback</strong> so that I feel <strong>excited and rewarded</strong>.</em>
 
 <h3> User Story 5: [NAME] </h3>
