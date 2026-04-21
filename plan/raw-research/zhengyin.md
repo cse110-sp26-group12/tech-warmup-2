@@ -35,3 +35,5 @@ AI can predict:
 
 - Trigger bonuses or rewards
 - Offer discounts or special deals
+
+I think this video(https://www.youtube.com/watch?v=VdBfhPp6vxk). It's a good resource for us to  get to know more about AI slot machine.
