@@ -1,9 +1,9 @@
 This file will serve as a record for every interaction with the AI model.
 
 1. Create a slot machine app that uses vanilla web technology like HTML, CSS, JavaScript, and Platform APIs. 
-      The app should be in a pokemon theme, thats visually and audibly engaging. Enjoyable for both gambling 
-      and non-gambling users. Only include 1 payline and 3 reels. Here are some personas and user stories to 
-      keep in mind while developing the app. Persona 1: Karen - "The High Gambler" Goal: Go all in. Win big  
+   The slot machine should make fun of AI, as in you are winning tokens and spending tokens. Enjoyable for both gambling 
+   and non-gambling users. Only include 1 payline and 3 reels. Here are some personas and user stories to 
+   keep in mind while developing the app. Persona 1: Karen - "The High Gambler" Goal: Go all in. Win big  
    or go home. There are no small wins for her.                                                              
    Risks: This means she'll bet a lot more than the usual customer. This means max lines, less spins,        
    high-confident, and low-hesitation.                                                                       
@@ -66,5 +66,8 @@ This file will serve as a record for every interaction with the AI model.
    As a casual player, I want clear visual and sound feedback so that I feel excited and rewarded.           
    User Story 5: Picky Pete                                                                                  
    As a picky user, I want to have control over the music, sounds, and visual webpage theme so I can tailor  
-   the game to my particular tastes.                                                                         
-▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄  
+   the game to my particular tastes.
+
+2. [Put the prompt you used here]
+3. [put the prompt you used here]
+4. you get the idea.
