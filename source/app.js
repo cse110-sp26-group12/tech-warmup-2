@@ -325,7 +325,11 @@ async function spin() {
 
     const reelPromises = elements.reels.map((reel, i) => {
         return new Promise(resolve => {
-            const spinDuration = 2000 + (i * 600);
+            let spinDuration = 2000 + (i * 600);
+            // Faster spinning for ChatGPT model to match Gary's "For-Fun" fast-paced playstyle
+            if (state.currentModel === 'chatgpt') {
+                spinDuration = 800 + (i * 200);
+            }
             const symbolHeight = 80;
             reel.classList.add('spinning');
             
