@@ -187,8 +187,8 @@ For each of the different models they should have thier own personality for the 
 
 **Outcome:** Everything described is working properly. The buttons are all visually appealing and there are no errors. The max amount bets all of the accounts tokens
 
-
 **Worked / didn't work:** no errors
+
 **Hand-edits:** None
 
 ---
