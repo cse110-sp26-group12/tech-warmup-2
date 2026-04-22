@@ -16,9 +16,18 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
 
+@keyframes movingGradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
 body {
     background-color: var(--bg-color);
     background-image: radial-gradient(circle at 50% 50%, rgba(124, 77, 255, 0.05) 0%, transparent 80%);
+    background: linear-gradient(-45deg, #050505, #1a1a2e, var(--secondary-color), var(--primary-color));
+    background-size: 400% 400%;
+    animation: movingGradient 15s ease infinite;
     color: var(--text-color);
     font-family: var(--font-family);
     display: flex;
