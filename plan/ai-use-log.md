@@ -222,9 +222,9 @@ For each of the different models they should have thier own personality for the 
 
 **Prompt:** This change will ONLY be for the Claude difficulty. First, center the jackpot and make sure it doesn't cut off the top of the slot machine. Second, set up the system of winning the jackbox, where the player needs to get three diamond emoji's in a row to win it. Third, inform the user if they win the jackbox. Fourth, somewhere on the slot machine, tell the user how to win the jackpot.
 
-**Outcome:** TBD
+**Outcome:** The AI changed a few lines. The slot machine isn't cut off anymore; however, it is cutting off the little information on how to win the jackpot. We have a little suspicion that you can still win the jackpot through other various methods. Thus, we should test that and fix that little info.
 
-**Hand-edits:** TBD
+**Hand-edits:** N/A
 
 ---
 ## Iteration 16 - [---]
