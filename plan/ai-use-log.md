@@ -195,14 +195,77 @@ For each of the different models they should have thier own personality for the 
 
 **Prompt:** Keep everything the same, this includes the format of the slot machine, the different gamemodes, the buttons, the currency, etc. However, can you change the colors of the background and border-colors of the slot machine so it isn't boring. Give the slot machine more life with colors.
 
+**Outcome:** Changed the color of the slot machine but not the background of the site. AI also added purple and blue neon borders around the slot machine. Everything else was kept the same.
+
+**Hand-edits:** N/A
+
+---
+## Iteration 13 - [Change the background]
+
+**Prompt:** Let's also change the background color of the actual site and not just the slot machine. We want the background of the site to be a moving-animated gradient of blue and purple. Do not touch anything else, we just want the background of the site to change color.
+
 **Outcome:** TBD
 
 **Hand-edits:** TBD
 
 ---
-## Iteration 13 - [---]
+## Iteration 14 - [---]
 
-**Prompt:** TBD
+**Prompt:** 
+
+**Outcome:** TBD
+
+**Hand-edits:** TBD
+
+---
+## Iteration 15 - [---]
+
+**Prompt:** 
+
+**Outcome:** TBD
+
+**Hand-edits:** TBD
+
+---
+## Iteration 16 - [---]
+
+**Prompt:** 
+
+**Outcome:** TBD
+
+**Hand-edits:** TBD
+
+---
+## Iteration 17 - [---]
+
+**Prompt:** 
+
+**Outcome:** TBD
+
+**Hand-edits:** TBD
+
+---
+## Iteration 18 - [---]
+
+**Prompt:** 
+
+**Outcome:** TBD
+
+**Hand-edits:** TBD
+
+---
+## Iteration 19 - [---]
+
+**Prompt:** 
+
+**Outcome:** TBD
+
+**Hand-edits:** TBD
+
+---
+## Iteration 20 - [---]
+
+**Prompt:** 
 
 **Outcome:** TBD
 
