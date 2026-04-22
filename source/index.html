@@ -16,23 +16,29 @@
             </div>
             <h1>AI Token Casino</h1>
             <div id="jackpot-display" class="jackpot-container">
-                <span id="jackpot-ticker">100,000</span>
+                <small>PRIORITY JACKPOT POOL</small>
+                <div class="jackpot-wrapper">
+                    <span id="jackpot-ticker">100,000</span>
+                </div>
                 <small>GPU CREDITS</small>
             </div>
         </header>
 
         <main>
-            <div class="slot-machine">
-                <div class="payline"></div>
-                <div class="reels-container">
-                    <div class="reel" id="reel-1">
-                        <div class="reel-strip"></div>
-                    </div>
-                    <div class="reel" id="reel-2">
-                        <div class="reel-strip"></div>
-                    </div>
-                    <div class="reel" id="reel-3">
-                        <div class="reel-strip"></div>
+            <div class="slot-machine-container">
+                <div id="win-overlay" class="win-overlay"></div>
+                <div class="slot-machine">
+                    <div class="payline"></div>
+                    <div class="reels-container">
+                        <div class="reel" id="reel-1">
+                            <div class="reel-strip"></div>
+                        </div>
+                        <div class="reel" id="reel-2">
+                            <div class="reel-strip"></div>
+                        </div>
+                        <div class="reel" id="reel-3">
+                            <div class="reel-strip"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -56,18 +62,20 @@
         </main>
 
         <aside class="sidebar">
+            <div class="sidebar-top">
+                <section class="stats-container">
+                    <h3>Performance Stats</h3>
+                    <div id="game-stats">
+                        <p>Inferences: <span id="stat-spins">0</span></p>
+                        <p>Yield: <span id="stat-won">0</span></p>
+                        <p>Missions: <span id="stat-missions">0/3</span></p>
+                    </div>
+                    <button id="paytable-btn">Model Architecture</button>
+                </section>
+            </div>
             <section class="logs-container">
                 <h3>Neural Logs</h3>
-                <div id="game-logs"></div>
-            </section>
-            <section class="stats-container">
-                <h3>Performance Stats</h3>
-                <div id="game-stats">
-                    <p>Inferences: <span id="stat-spins">0</span></p>
-                    <p>Yield: <span id="stat-won">0</span></p>
-                    <p>Missions: <span id="stat-missions">0/3</span></p>
-                </div>
-                <button id="paytable-btn">Model Architecture (Paytable)</button>
+                <div id="game-logs" class="game-logs"></div>
             </section>
         </aside>
 

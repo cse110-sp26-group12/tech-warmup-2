@@ -168,3 +168,29 @@ For each of the different models they should have thier own personality for the 
 
 ---
 
+## Iteration 10 — [Bug Fixes + a few more features]
+
+**Prompt:** You have reintroduced the bug where the Neural Logs gets filled with a lot of logs and then it starts expanding and pushing down the UI. Plus also when you win make it so that it shows how much you won off it or lost off of it using an animation and payout multiplier etc. also for the claude jackpot make it clear that that is the jackpot amount to win also make it 1M tokens. also the environment settings and the paytable should open up as a modal not on the side.  
+
+**Outcome:** Very good visual effects with the amount loss and the amount won. Also the logs dont fill up and expand the page etc. the environment settings and the model payouts are opening up as modals
+
+
+**Worked / didn't work:** There are few more UI changes that I would want to make some of the buttons got messed up such as the + button for adding tokens. and the max button should bet the whole account amount. and also the buttons for the bets are not spaced properly
+
+**Hand-edits:** None
+
+---
+
+## Iteration 11 — [UI changes]
+
+**Prompt:** Check 
+
+**Outcome:** Very good visual effects with the amount loss and the amount won. Also the logs dont fill up and expand the page etc. the environment settings and the model payouts are opening up as modals
+
+
+**Worked / didn't work:** There are few more UI changes that I would want to make some of the buttons got messed up such as the + button for adding tokens. and the max button should bet the whole account amount. and also the buttons for the bets are not spaced properly
+
+**Hand-edits:** None
+
+---
+
