@@ -7,30 +7,19 @@
     --reel-bg: #0a0a0a;
     --card-bg: #1a1a1a;
     --border-radius: 12px;
-    --panel-shadow: 0 0 20px rgba(0, 229, 255, 0.2);
     --font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-[data-theme="light"] {
-    --bg-color: #f0f2f5;
-    --text-color: #1a1a1a;
-    --primary-color: #00838f;
-    --secondary-color: #4527a0;
-    --accent-color: #c2185b;
-    --reel-bg: #ffffff;
-    --card-bg: #e0e0e0;
-    --panel-shadow: 0 4px 12px rgba(0,0,0,0.1);
+[data-model="chatgpt"] {
+    --primary-color: #10a37f;
+    --secondary-color: #ffd54f;
+    --accent-color: #ff8a65;
 }
 
-[data-theme="cyber"] {
-    --bg-color: #000b1e;
-    --text-color: #00ff41;
-    --primary-color: #00ff41;
-    --secondary-color: #bc00ff;
-    --accent-color: #ffff00;
-    --reel-bg: #001532;
-    --card-bg: #001f4d;
-    --panel-shadow: 0 0 15px #00ff41;
+[data-model="claude"] {
+    --primary-color: #d97757;
+    --secondary-color: #54362b;
+    --accent-color: #ffffff;
 }
 
 * {
@@ -51,8 +40,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    overflow-x: hidden;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .app-container {
@@ -61,13 +50,15 @@ body {
         "header header"
         "main sidebar"
         "footer footer";
-    grid-template-columns: 1fr 320px;
-    gap: 30px;
-    width: 95vw;
-    max-width: 1300px;
-    padding: 30px;
-    background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px);
+    grid-template-columns: 1fr 340px;
+    grid-template-rows: auto 1fr auto;
+    gap: 15px;
+    width: 98vw;
+    height: 96vh;
+    max-width: 1400px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(15px);
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
@@ -75,30 +66,56 @@ body {
 header {
     grid-area: header;
     text-align: center;
-    padding-bottom: 20px;
+    position: relative;
+}
+
+.model-selector {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    gap: 5px;
+    background: rgba(0,0,0,0.5);
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.model-btn {
+    padding: 5px 12px;
+    font-size: 0.75rem;
+    background: transparent;
+    color: #666;
+    border: 1px solid #333;
+    border-radius: 6px;
+    transition: all 0.3s;
+}
+
+.model-btn.active {
+    background: var(--primary-color);
+    color: #000;
+    border-color: #fff;
+    box-shadow: 0 0 10px var(--primary-color);
 }
 
 h1 {
-    font-size: 2.5rem;
+    font-size: 1.8rem;
     text-transform: uppercase;
-    letter-spacing: 4px;
+    letter-spacing: 3px;
     background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.5));
 }
 
 .jackpot-container {
-    margin-top: 10px;
+    margin-top: 5px;
     font-family: 'Courier New', Courier, monospace;
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     color: var(--accent-color);
     background: rgba(0, 0, 0, 0.5);
-    padding: 10px 30px;
+    padding: 5px 20px;
     border-radius: 50px;
     display: inline-block;
     border: 2px solid var(--accent-color);
-    box-shadow: 0 0 20px rgba(255, 64, 129, 0.3);
 }
 
 main {
@@ -106,62 +123,47 @@ main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 40px;
+    justify-content: center;
+    gap: 15px;
+    overflow: hidden;
 }
 
-/* Slot Machine Cabinet */
 .slot-machine {
     position: relative;
     background: linear-gradient(145deg, #2a2a2a, #111);
-    padding: 35px;
-    border-radius: 25px;
-    box-shadow: 
-        0 20px 50px rgba(0,0,0,0.8),
-        inset 0 2px 5px rgba(255,255,255,0.1);
-    border: 8px solid #333;
-}
-
-.slot-machine::before {
-    content: '';
-    position: absolute;
-    top: -10px; left: -10px; right: -10px; bottom: -10px;
-    border-radius: 30px;
-    border: 2px solid var(--secondary-color);
-    opacity: 0.3;
-    pointer-events: none;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    border: 6px solid #333;
+    display: flex;
+    align-items: center;
 }
 
 .reels-container {
     display: flex;
-    gap: 20px;
+    gap: 12px;
     background: #000;
-    padding: 15px;
-    border-radius: 15px;
-    box-shadow: inset 0 0 30px rgba(0,0,0,1);
-    border: 3px solid #444;
+    padding: 10px;
+    border-radius: 12px;
+    box-shadow: inset 0 0 30px #000;
 }
 
 .reel {
-    width: 160px;
-    height: 300px;
-    background: linear-gradient(to bottom, #0a0a0a, #1a1a1a 20%, #1a1a1a 80%, #0a0a0a);
-    border-radius: 10px;
+    width: 140px;
+    height: 240px;
+    background: linear-gradient(to bottom, #050505, #151515 20%, #151515 80%, #050505);
+    border-radius: 8px;
     position: relative;
     overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.05);
-}
-
-.reel-strip.spinning {
-    filter: blur(3px) brightness(1.2);
+    border: 1px solid rgba(255,255,255,0.03);
 }
 
 .symbol {
-    height: 100px;
+    height: 80px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 3.5rem;
-    filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
+    font-size: 3rem;
 }
 
 .symbol.win {
@@ -169,8 +171,8 @@ main {
 }
 
 @keyframes symbol-win {
-    from { transform: scale(1) rotate(0); filter: brightness(1) drop-shadow(0 0 5px var(--primary-color)); }
-    to { transform: scale(1.2) rotate(5deg); filter: brightness(1.5) drop-shadow(0 0 20px var(--primary-color)); }
+    from { transform: scale(1); filter: brightness(1) drop-shadow(0 0 5px var(--primary-color)); }
+    to { transform: scale(1.15); filter: brightness(1.5) drop-shadow(0 0 15px var(--primary-color)); }
 }
 
 .payline {
@@ -178,8 +180,8 @@ main {
     top: 50%;
     left: 0;
     width: 100%;
-    height: 4px;
-    background: linear-gradient(to right, transparent, var(--accent-color), transparent);
+    height: 3px;
+    background: var(--accent-color);
     opacity: 0;
     z-index: 10;
     pointer-events: none;
@@ -187,20 +189,19 @@ main {
 }
 
 .payline.active {
-    opacity: 1;
-    box-shadow: 0 0 20px var(--accent-color);
+    opacity: 0.8;
+    box-shadow: 0 0 15px var(--accent-color);
 }
 
-/* Controls Section */
 .controls {
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    gap: 12px;
     width: 100%;
-    max-width: 600px;
-    padding: 25px;
+    max-width: 500px;
+    padding: 15px;
     background: rgba(255, 255, 255, 0.03);
-    border-radius: 20px;
+    border-radius: 15px;
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -208,217 +209,167 @@ main {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 25px;
+    padding: 8px 20px;
     background: #000;
-    border-radius: 15px;
-    border-left: 5px solid var(--primary-color);
-    box-shadow: inset 0 0 10px rgba(0, 229, 255, 0.2);
+    border-radius: 10px;
+    border-left: 4px solid var(--primary-color);
 }
 
 .balance-label {
     text-transform: uppercase;
-    font-size: 0.9rem;
-    letter-spacing: 2px;
+    font-size: 0.75rem;
     color: var(--primary-color);
 }
 
 #token-balance {
     font-family: 'Courier New', Courier, monospace;
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: bold;
 }
 
 #add-tokens-btn {
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    width: 30px;
+    height: 30px;
     background: var(--primary-color);
     color: #000;
     border-radius: 50%;
-    font-size: 1.5rem;
-    box-shadow: 0 0 15px var(--primary-color);
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .bet-controls {
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 8px;
 }
 
 .bet-btn {
     flex: 1;
     background: #222;
     color: #fff;
-    border: 2px solid #444;
-    border-radius: 10px;
-    font-size: 1.1rem;
-    padding: 12px;
-}
-
-.bet-btn:hover {
-    border-color: var(--primary-color);
-    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    padding: 8px;
 }
 
 .bet-btn.active {
     background: var(--primary-color);
     color: #000;
-    border-color: #fff;
-    box-shadow: 0 0 15px var(--primary-color);
+    box-shadow: 0 0 10px var(--primary-color);
 }
 
 .action-buttons {
     display: flex;
-    gap: 20px;
+    gap: 15px;
 }
 
 #spin-btn {
     flex: 2;
-    height: 70px;
-    font-size: 1.8rem;
-    text-transform: uppercase;
-    letter-spacing: 3px;
+    height: 55px;
+    font-size: 1.4rem;
     background: linear-gradient(to bottom, var(--accent-color), #d81b60);
     color: white;
-    border-radius: 15px;
-    box-shadow: 0 5px 0 #ad1457, 0 10px 20px rgba(0,0,0,0.4);
+    border-radius: 10px;
+    box-shadow: 0 4px 0 #ad1457;
 }
 
 #spin-btn:active {
-    transform: translateY(3px);
-    box-shadow: 0 2px 0 #ad1457, 0 5px 10px rgba(0,0,0,0.4);
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #ad1457;
 }
 
 #auto-btn {
     flex: 1;
     background: #333;
     color: #fff;
-    border: 2px solid #555;
-    border-radius: 15px;
+    border-radius: 10px;
 }
 
 #auto-btn.active {
     background: #ffeb3b;
     color: #000;
-    border-color: #fff;
-    box-shadow: 0 0 20px #ffeb3b;
+    box-shadow: 0 0 15px #ffeb3b;
 }
 
-/* Sidebar Styling */
 .sidebar {
     grid-area: sidebar;
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    gap: 15px;
+    max-height: 100%;
 }
 
 .logs-container, .stats-container {
-    background: #111;
-    padding: 20px;
-    border-radius: 15px;
-    border: 1px solid #333;
-    box-shadow: var(--panel-shadow);
+    background: #0a0a0a;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #222;
+    overflow: hidden;
 }
 
-h3 {
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 15px;
-    color: var(--secondary-color);
-    border-bottom: 1px solid #333;
-    padding-bottom: 8px;
+.logs-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 #game-logs {
-    height: 350px;
+    flex: 1;
     overflow-y: auto;
-    font-size: 0.85rem;
-    line-height: 1.6;
+    font-size: 0.8rem;
     font-family: 'Courier New', Courier, monospace;
-    scrollbar-width: thin;
-    scrollbar-color: var(--secondary-color) #000;
+    padding-right: 5px;
 }
 
-.log-entry {
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
-}
-
-#game-stats p {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 12px;
-    font-size: 1rem;
-}
-
-#game-stats span {
-    color: var(--primary-color);
-    font-weight: bold;
+h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--secondary-color);
+    margin-bottom: 8px;
+    border-bottom: 1px solid #222;
 }
 
 footer {
     grid-area: footer;
     text-align: center;
-    padding-top: 20px;
 }
 
 #settings-btn {
     background: transparent;
-    color: #666;
-    border: 1px solid #333;
-    padding: 8px 20px;
+    color: #444;
+    border: 1px solid #222;
+    padding: 4px 15px;
+    font-size: 0.75rem;
 }
 
-#settings-btn:hover {
-    color: #fff;
-    border-color: #666;
+.modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
 }
 
-/* Modals */
 .modal-content {
-    background: #1a1a1a;
-    padding: 40px;
+    background: #111;
+    padding: 30px;
     border-radius: 20px;
     border: 2px solid var(--secondary-color);
-    box-shadow: 0 0 50px rgba(0,0,0,0.9);
+    width: 380px;
 }
 
-/* Animations */
-.win-flash {
-    animation: flash 0.3s ease-out 2;
-}
+.hidden { display: none; }
 
-@keyframes flash {
-    0% { background: transparent; }
-    50% { background: rgba(255, 255, 255, 0.1); }
-    100% { background: transparent; }
-}
-
-@media (max-width: 1000px) {
+@media (max-width: 900px) {
     .app-container {
-        grid-template-areas: 
-            "header"
-            "main"
-            "sidebar"
-            "footer";
+        grid-template-areas: "header" "main" "sidebar";
         grid-template-columns: 1fr;
+        overflow-y: auto;
     }
-    
-    .reels-container {
-        gap: 10px;
-    }
-    
-    .reel {
-        width: 110px;
-        height: 200px;
-    }
-    
-    .symbol {
-        height: 66px;
-        font-size: 2.5rem;
-    }
+    body { overflow: auto; }
 }

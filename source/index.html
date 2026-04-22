@@ -9,6 +9,11 @@
 <body>
     <div class="app-container">
         <header>
+            <div class="model-selector">
+                <button class="model-btn" data-model="chatgpt">Gary (GPT)</button>
+                <button class="model-btn active" data-model="gemini">Gemini (AI)</button>
+                <button class="model-btn" data-model="claude">Karen (Claude)</button>
+            </div>
             <h1>AI Token Casino</h1>
             <div class="jackpot-container">
                 <span id="jackpot-ticker">100,000</span>
@@ -40,11 +45,8 @@
                     </div>
                     <button id="add-tokens-btn" title="Refill Compute Credits">+</button>
                 </div>
-                <div class="bet-controls">
-                    <button class="bet-btn" data-amount="1">1</button>
-                    <button class="bet-btn active" data-amount="10">10</button>
-                    <button class="bet-btn" data-amount="100">100</button>
-                    <button class="bet-btn" id="max-bet">MAX</button>
+                <div class="bet-controls" id="bet-container">
+                    <!-- Dynamic Bet Buttons -->
                 </div>
                 <div class="action-buttons">
                     <button id="spin-btn">Spin Model</button>
@@ -76,14 +78,6 @@
     <div id="settings-modal" class="modal hidden">
         <div class="modal-content">
             <h2>Environment Configuration</h2>
-            <div class="setting-group">
-                <label>Theme Overlay</label>
-                <select id="theme-select">
-                    <option value="dark">Shadow Mode (Dark)</option>
-                    <option value="light">Prompt Engineer (Light)</option>
-                    <option value="cyber">Neural Network (Cyberpunk)</option>
-                </select>
-            </div>
             <div class="setting-group">
                 <label>Audio Feedback</label>
                 <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.5">

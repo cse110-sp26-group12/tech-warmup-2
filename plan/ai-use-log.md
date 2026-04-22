@@ -112,3 +112,36 @@ Clear code matters more than clever code — the goal is a codebase that reads a
 
 ---
 
+## Iteration 6 — [Cleaning up UI Part 2]
+
+**Prompt:** I dont like that I have to scroll up and down to access the buttons. It should all fit in one page without needing to scroll up and down. Additionally the environment configuration should open up as a modal from a settings button, then you can change the theme from there.
+
+**Outcome:** Completely changed the UI it looks a lot better now. Added backdrops and colors to the buttons. The buttons look like they have depth added to them
+
+**Worked / didn't work:** We have to scroll up and down which might be annoying from a UX perspective, also the setting doesnt open up as a modal. 
+
+**Hand-edits:** None
+
+---
+
+## Iteration 7 — [Adding different games to match different personas etc]
+
+**Prompt:** For the game I want it to be fun and more interactive so I want to add more options to fit different personas: I want to be able to play the slot machine with 3 different AI models where I can choose from and each of them changes the game slightly: 
+
+Claude (difficulty - high): To fit the Persona of Karen: Goal: Go all in. Win big or go home. There are no small wins for her. Risks: This means she'll bet a lot more than the usual customer. This means max lines, less spins, high-confident, and low-hesitation. She will look for the slot machines with the biggest jackpot number. Most Karens would abandon the slot if there is no "big win" within an allotted amount of spins. Believes in the affects of RNG and the biases. Checks withdrawl limits before depositing her money/credit/or whatever currency is used at the casino. Focused, impatient, maybe superstitious. High volatility: In other words, a slot that has a high payout. Live Jackpot: She needs to see the jackpot amount and that it updates in real time. Autoplay: She may set it for a given amount of spins and walks away briefly. No Entertainment: Karen isn't there for the lights, she is there for the wins. For this make the min bet high and increments highly and the payouts high. This one will have a jackpot
+
+ChatGPT (difficulty - low): to fit the persona of Gary - "The 'For-Fun' Gambler" Goal: He is at the casino to have fun. Trying to make $20 last. Risks: Low. He will play small bets and avoid big losses. Type of gambler to spend more money on food than the actual slots. Uses low bet sizes, Fun lights/colors: He doesn't want a bland and boring slot. Themes and animations: Being overwhelmed is nothing to him. Low volatility: Doesn't care about getting multiple wins. This one should have more frequent wins etc. 
+
+Gemini (difficulty - medium): This is for the personas in between karen and gary. making it a medium difficulty
+
+For each of the different models they should have thier own personality for the emojis as well as the chat logs that they say. 
+
+**Outcome:** Added 3 more options for different models to play with each catering to different personas, Themes also change with each AI as well as payouts,
+
+**Worked / didn't work:** Everything is working good, I noticed a few bugs where I noticed that as neural log grows and pushes everything down it should clip them. 
+
+**Hand-edits:** None
+
+---
+
+
