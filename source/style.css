@@ -67,6 +67,7 @@ header {
     grid-area: header;
     text-align: center;
     position: relative;
+    padding-bottom: 10px;
 }
 
 .model-selector {
@@ -81,8 +82,8 @@ header {
 }
 
 .model-btn {
-    padding: 5px 12px;
-    font-size: 0.75rem;
+    padding: 5px 15px;
+    font-size: 0.8rem;
     background: transparent;
     color: #666;
     border: 1px solid #333;
@@ -299,14 +300,7 @@ main {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    max-height: 100%;
-}
-
-.logs-container, .stats-container {
-    background: #0a0a0a;
-    padding: 12px;
-    border-radius: 12px;
-    border: 1px solid #222;
+    height: 100%;
     overflow: hidden;
 }
 
@@ -314,6 +308,11 @@ main {
     flex: 1;
     display: flex;
     flex-direction: column;
+    background: #0a0a0a;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #222;
+    min-height: 0; /* Critical for flex stability */
 }
 
 #game-logs {
@@ -322,6 +321,23 @@ main {
     font-size: 0.8rem;
     font-family: 'Courier New', Courier, monospace;
     padding-right: 5px;
+}
+
+.stats-container {
+    background: #0a0a0a;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #222;
+}
+
+#paytable-btn {
+    width: 100%;
+    margin-top: 10px;
+    background: #222;
+    color: var(--secondary-color);
+    border: 1px solid var(--secondary-color);
+    padding: 6px;
+    font-size: 0.75rem;
 }
 
 h3 {
@@ -361,7 +377,27 @@ footer {
     border-radius: 20px;
     border: 2px solid var(--secondary-color);
     width: 380px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
 }
+
+.paytable-grid {
+    flex: 1;
+    overflow-y: auto;
+    margin: 15px 0;
+}
+
+.paytable-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #222;
+}
+
+.paytable-sym { font-size: 2rem; }
+.paytable-val { color: var(--primary-color); font-weight: bold; }
 
 .hidden { display: none; }
 

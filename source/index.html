@@ -10,12 +10,12 @@
     <div class="app-container">
         <header>
             <div class="model-selector">
-                <button class="model-btn" data-model="chatgpt">Gary (GPT)</button>
-                <button class="model-btn active" data-model="gemini">Gemini (AI)</button>
-                <button class="model-btn" data-model="claude">Karen (Claude)</button>
+                <button class="model-btn" data-model="chatgpt">ChatGPT</button>
+                <button class="model-btn active" data-model="gemini">Gemini</button>
+                <button class="model-btn" data-model="claude">Claude</button>
             </div>
             <h1>AI Token Casino</h1>
-            <div class="jackpot-container">
+            <div id="jackpot-display" class="jackpot-container">
                 <span id="jackpot-ticker">100,000</span>
                 <small>GPU CREDITS</small>
             </div>
@@ -67,6 +67,7 @@
                     <p>Yield: <span id="stat-won">0</span></p>
                     <p>Missions: <span id="stat-missions">0/3</span></p>
                 </div>
+                <button id="paytable-btn">Model Architecture (Paytable)</button>
             </section>
         </aside>
 
@@ -75,6 +76,7 @@
         </footer>
     </div>
 
+    <!-- Modals -->
     <div id="settings-modal" class="modal hidden">
         <div class="modal-content">
             <h2>Environment Configuration</h2>
@@ -83,6 +85,16 @@
                 <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.5">
             </div>
             <button id="close-settings">Apply & Close</button>
+        </div>
+    </div>
+
+    <div id="paytable-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="paytable-title">Model Payout Structure</h2>
+            <div id="paytable-grid" class="paytable-grid">
+                <!-- Dynamic Payout List -->
+            </div>
+            <button id="close-paytable">Return to Terminal</button>
         </div>
     </div>
 

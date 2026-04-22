@@ -5,10 +5,12 @@
 
 /**
  * @typedef {Object} ModelConfig
+ * @property {string} name - Display name.
  * @property {string[]} symbols - Emojis used for this model.
  * @property {Object<string, number>} payouts - Payout multipliers.
  * @property {number[]} bets - Available bet amounts.
  * @property {number} winFrequency - Relative win probability.
+ * @property {boolean} hasJackpot - Whether this model offers a jackpot.
  * @property {Object} logs - Personality-driven log messages.
  */
 
@@ -18,10 +20,11 @@ const MODEL_CONFIGS = {
         symbols: ['🍕', '🍦', '🍔', '🌮', '🍩', '🎈', '🎉', '🎁', '🐶'],
         payouts: { '🍕': 50, '🍦': 20, '🍔': 10, '🌮': 5, '🍩': 5, '🎈': 2, '🎉': 2, '🎁': 1, '🐶': 1 },
         bets: [1, 2, 5, 10],
-        winFrequency: 0.4, // High frequency
+        winFrequency: 0.4,
+        hasJackpot: false,
         logs: {
-            spin: ["Ordering a pizza while I spin...", " Gary's here for a good time!", "Trying to make $20 last all night.", "Ooh, look at the pretty lights!"],
-            win: ["Enough for a taco! Gary's winning!", "Free ice cream on me!", "This is better than a side quest.", " Gary's the luckiest guy in the food court!"],
+            spin: ["Ordering a pizza while I spin...", "Gary's here for a good time!", "Trying to make $20 last all night.", "Ooh, look at the pretty lights!"],
+            win: ["Enough for a taco! Gary's winning!", "Free ice cream on me!", "This is better than a side quest.", "Gary's the luckiest guy in the food court!"],
             loss: ["No pizza this time. Bummer.", "Gary's still having fun though!", "Maybe I should have spent this on a burger.", "Oops, my $20 is getting nervous."],
             idle: ["Gary's thinking about a late-night donut.", "Is it a win if the colors are pretty?", "Gary loves the free refills here.", "Why win big when you can win fun?"]
         }
@@ -31,7 +34,8 @@ const MODEL_CONFIGS = {
         symbols: ['🛸', '💎', '🧠', '🤖', '🐍', '⚡', '📉', '🔥', '🔒'],
         payouts: { '🛸': 500, '💎': 100, '🧠': 50, '🤖': 20, '🐍': 15, '⚡': 5, '📉': 0, '🔥': 0, '🔒': 0 },
         bets: [10, 20, 50, 100],
-        winFrequency: 0.25, // Medium frequency
+        winFrequency: 0.25,
+        hasJackpot: false,
         logs: {
             spin: ["Tokenizing prompt sequence...", "Executing forward pass...", "Querying vector database...", "Applying multi-head attention..."],
             win: ["Validation loss decreased! Profit achieved.", "Emergent behavior detected: Payout sequence.", "RLHF feedback: This is a high-quality win.", "Neural network weights aligned successfully."],
@@ -44,7 +48,8 @@ const MODEL_CONFIGS = {
         symbols: ['💰', '🎰', '🏦', '💎', '💳', '📊', '📈', '🏢', '⚖️'],
         payouts: { '💰': 1000, '🎰': 500, '🏦': 200, '💎': 100, '💳': 50, '📊': 0, '📈': 0, '🏢': 0, '⚖️': 0 },
         bets: [100, 200, 500, 1000],
-        winFrequency: 0.15, // Low frequency, high volatility
+        winFrequency: 0.15,
+        hasJackpot: true,
         logs: {
             spin: ["I need to see the manager of this RNG.", "This machine better be 'loose'.", "All in. I don't have time for small talk.", "Where's my high-roller suite?"],
             win: ["Finally! I'll be taking my credits now.", "This is the bare minimum I expected.", "SINGULARITY ACHIEVED! Call the manager!", "I knew the withdrawal limit was a lie."],
@@ -74,6 +79,7 @@ let reelStopHandlers = [];
 const elements = {
     appContainer: document.querySelector('.app-container'),
     slotMachine: document.querySelector('.slot-machine'),
+    jackpotDisplay: document.getElementById('jackpot-display'),
     reels: [
         document.querySelector('#reel-1 .reel-strip'),
         document.querySelector('#reel-2 .reel-strip'),
@@ -98,6 +104,11 @@ const elements = {
     settingsModal: document.getElementById('settings-modal'),
     settingsBtn: document.getElementById('settings-btn'),
     closeSettings: document.getElementById('close-settings'),
+    paytableBtn: document.getElementById('paytable-btn'),
+    paytableModal: document.getElementById('paytable-modal'),
+    closePaytable: document.getElementById('close-paytable'),
+    paytableGrid: document.getElementById('paytable-grid'),
+    paytableTitle: document.getElementById('paytable-title'),
     modelBtns: document.querySelectorAll('.model-btn')
 };
 
@@ -127,6 +138,9 @@ function setModel(modelId) {
     document.body.setAttribute('data-model', modelId);
     elements.modelBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.model === modelId));
     
+    // Toggle Jackpot visibility
+    elements.jackpotDisplay.classList.toggle('hidden', !config.hasJackpot);
+    
     // Update Bet Buttons
     elements.betContainer.innerHTML = '';
     config.bets.forEach(amount => {
@@ -143,7 +157,6 @@ function setModel(modelId) {
         elements.betContainer.appendChild(btn);
     });
     
-    // Add MAX bet button
     const maxBtn = document.createElement('button');
     maxBtn.className = 'bet-btn';
     maxBtn.id = 'max-bet';
@@ -151,13 +164,12 @@ function setModel(modelId) {
     maxBtn.onclick = () => {
         document.querySelectorAll('.bet-btn').forEach(b => b.classList.remove('active'));
         maxBtn.classList.add('active');
-        state.currentBet = Math.min(state.tokens, 1000);
+        state.currentBet = Math.min(state.tokens, config.bets[config.bets.length-1] * 2);
         addLog(`Going all in: ${state.currentBet} bet set.`);
         playSound(1000, 'sine', 0.1);
     };
     elements.betContainer.appendChild(maxBtn);
 
-    // Default to first bet if current is invalid
     if (!config.bets.includes(state.currentBet)) {
         state.currentBet = config.bets[0];
         const firstBtn = elements.betContainer.querySelector('.bet-btn');
@@ -167,6 +179,37 @@ function setModel(modelId) {
     addLog(`System reconfigured: Loaded ${config.name} model architecture.`);
     initReels();
     updateUI(true);
+}
+
+// Paytable Logic
+function openPaytable() {
+    const config = MODEL_CONFIGS[state.currentModel];
+    elements.paytableTitle.textContent = `${config.name} Payouts`;
+    elements.paytableGrid.innerHTML = '';
+    
+    config.symbols.forEach(sym => {
+        const payout = config.payouts[sym];
+        const item = document.createElement('div');
+        item.className = 'paytable-item';
+        item.innerHTML = `
+            <span class="paytable-sym">${sym}</span>
+            <span class="paytable-val">${payout > 0 ? 'x' + payout : 'Hallucination (0)'}</span>
+        `;
+        elements.paytableGrid.appendChild(item);
+    });
+
+    if (config.hasJackpot) {
+        const jackpotItem = document.createElement('div');
+        jackpotItem.className = 'paytable-item';
+        jackpotItem.style.borderTop = '2px solid var(--accent-color)';
+        jackpotItem.innerHTML = `
+            <span class="paytable-sym">💰💰💰</span>
+            <span class="paytable-val">LIVE JACKPOT</span>
+        `;
+        elements.paytableGrid.appendChild(jackpotItem);
+    }
+
+    elements.paytableModal.classList.remove('hidden');
 }
 
 // UI Updates
@@ -257,10 +300,9 @@ async function spin() {
     const config = MODEL_CONFIGS[state.currentModel];
     const results = [];
     
-    // Deterministic results based on winFrequency
     const isWin = Math.random() < config.winFrequency;
     if (isWin) {
-        const winSym = config.symbols[Math.floor(Math.random() * 4)]; // Favor high value symbols for wins
+        const winSym = config.symbols[Math.floor(Math.random() * 4)];
         results.push(winSym, winSym, winSym);
     } else {
         while (results.length < 3) {
@@ -321,9 +363,8 @@ function checkWin(results) {
         const basePayout = config.payouts[r1] || 0;
         winAmount = basePayout * state.currentBet;
         
-        // Special Jackpot handling
-        if ((state.currentModel === 'gemini' && (r1 === '🛸' || r1 === '💎')) ||
-            (state.currentModel === 'claude' && (r1 === '💰' || r1 === '🎰'))) {
+        // Jackpot logic restricted to Claude (Karen)
+        if (config.hasJackpot && (r1 === '💰' || r1 === '🎰')) {
             winAmount += state.jackpot;
             state.jackpot = 100000;
             elements.slotMachine.classList.add('big-win-glow');
@@ -381,12 +422,11 @@ elements.addTokensBtn.addEventListener('click', () => {
     playSound(600, 'sine', 0.2);
 });
 
-elements.modelBtns.forEach(btn => {
-    btn.addEventListener('click', () => setModel(btn.dataset.model));
-});
-
+elements.modelBtns.forEach(btn => btn.addEventListener('click', () => setModel(btn.dataset.model)));
 elements.settingsBtn.addEventListener('click', () => elements.settingsModal.classList.remove('hidden'));
 elements.closeSettings.addEventListener('click', () => elements.settingsModal.classList.add('hidden'));
+elements.paytableBtn.addEventListener('click', openPaytable);
+elements.closePaytable.addEventListener('click', () => elements.paytableModal.classList.add('hidden'));
 elements.volumeSlider.addEventListener('input', (e) => state.settings.volume = parseFloat(e.target.value));
 
 setInterval(() => {

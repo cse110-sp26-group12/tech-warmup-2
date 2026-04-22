@@ -144,4 +144,27 @@ For each of the different models they should have thier own personality for the 
 
 ---
 
+## Iteration 8 — [Fixing a few features and bugs]
+
+**Prompt:** Make it so that the three buttons for the 3 different games say the following only: ChatGPT, Gemini, Claude, I also noticed that as the chat logs grows it pushes everything down please fix this. I also want more information of all the payout structures for each of the models so that the user has information on the payouts and so they would be more informed when playing of what to expect. also Claude should have a jackpot chance where you can win a very big amount. The other two model they would not have a jackpot
+
+**Outcome:** Fixed the neural logs overflow, Added a button for paytable showing the different payouts structures for each model. 
+
+**Worked / didn't work:** Works find
+
+**Hand-edits:** None
+
+---
+
+## Iteration 9 — [Cleaning up UI Part 4]
+
+**Prompt:** Make it so that the three buttons for the 3 different games say the following only: ChatGPT, Gemini, Claude, I also noticed that as the chat logs grows it pushes everything down please fix this. I also want more information of all the payout structures for each of the models so that the user has information on the payouts and so they would be more informed when playing of what to expect. also Claude should have a jackpot chance where you can win a very big amount. The other two model they would not have a jackpot
+
+**Outcome:** Fixed the neural logs overflow, Added a button for paytable showing the different payouts structures for each model. 
+
+**Worked / didn't work:** Works find
+
+**Hand-edits:** None
+
+---
 
