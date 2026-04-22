@@ -266,10 +266,10 @@ For each of the different models they should have thier own personality for the 
 **Hand-edits:** N/A
 
 ---
-## Iteration 20 - [---]
+## Iteration 20 - [Fixing Betsizes and Paylines cont.]
 
-**Prompt:** 
+**Prompt:** For every mode, change the betsizes to include 6 buttons. Then each sequential higher bet increases by 2 * (the mode's factor). So for example, the CHATGPT slot machine should have buttons [1, 3, 5, 7, 9, MAX]. This way each bet size is easily divisible by the paylines. The betsize should not be getting multiplied by the number of paylines. Keep the functionality of the MAX bet button as is.
 
-**Outcome:** TBD
+**Outcome:** Honestly, pleasantly surprised that it worked. I thought my prompt wasn't specific enough and that it wouldn't work as I intended.
 
-**Hand-edits:** TBD
+**Hand-edits:** N/A

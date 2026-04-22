@@ -29,7 +29,7 @@ const MODEL_CONFIGS = {
             '🎁': {3: 0.5, 4: 1, 5: 5}, 
             '🐶': {3: 0.5, 4: 1, 5: 5} 
         },
-        bets: [1, 2, 5, 10],
+        factor: 1,
         winFrequency: 0.55,
         hasJackpot: false,
         logs: {
@@ -53,7 +53,7 @@ const MODEL_CONFIGS = {
             '🔥': {3: 0, 4: 0, 5: 0}, 
             '🔒': {3: 0, 4: 0, 5: 0} 
         },
-        bets: [10, 20, 50, 100],
+        factor: 10,
         winFrequency: 0.35,
         hasJackpot: false,
         logs: {
@@ -77,7 +77,7 @@ const MODEL_CONFIGS = {
             '🏢': {3: 0, 4: 0, 5: 0}, 
             '⚖️': {3: 0, 4: 0, 5: 0} 
         },
-        bets: [100, 200, 500, 1000],
+        factor: 100,
         winFrequency: 0.15,
         hasJackpot: true,
         logs: {
@@ -198,17 +198,20 @@ function setModel(modelId) {
     
     // Update Bet Buttons
     elements.betContainer.innerHTML = '';
-    const paylineMap = [1, 3, 5, 9];
-    config.bets.forEach((amount, index) => {
+    const paylineMap = [1, 3, 5, 7, 9];
+    const factor = config.factor || 1;
+    
+    paylineMap.forEach((lines) => {
+        const amount = lines * factor;
         const btn = document.createElement('button');
         btn.className = 'bet-btn';
-        if (amount === state.currentBet && state.activePaylines === paylineMap[index]) btn.classList.add('active');
+        if (amount === state.currentBet && lines === state.activePaylines) btn.classList.add('active');
         btn.textContent = amount;
         btn.onclick = () => {
             document.querySelectorAll('.bet-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             state.currentBet = amount;
-            state.activePaylines = paylineMap[index];
+            state.activePaylines = lines;
             updateUI();
             playSound(800, 'sine', 0.05);
         };
@@ -225,26 +228,29 @@ function setModel(modelId) {
         
         // Select max paylines affordable
         if (state.tokens >= 9) state.activePaylines = 9;
+        else if (state.tokens >= 7) state.activePaylines = 7;
         else if (state.tokens >= 5) state.activePaylines = 5;
         else if (state.tokens >= 3) state.activePaylines = 3;
         else state.activePaylines = 1;
         
-        state.currentBet = Math.floor(state.tokens / state.activePaylines);
-        if (state.currentBet <= 0) state.currentBet = state.tokens > 0 ? 1 : config.bets[0];
+        const tokensPerLine = Math.floor(state.tokens / state.activePaylines);
+        state.currentBet = tokensPerLine * state.activePaylines;
+        if (state.currentBet <= 0) {
+            state.activePaylines = 1;
+            state.currentBet = state.tokens > 0 ? state.tokens : factor;
+        }
         
-        addLog(`ALL IN: ${state.currentBet.toLocaleString()} per line on ${state.activePaylines} lines!`);
+        addLog(`ALL IN: ${Math.floor(state.currentBet / state.activePaylines).toLocaleString()} per line on ${state.activePaylines} lines!`);
         updateUI();
         playSound(1000, 'sine', 0.1);
     };
     elements.betContainer.appendChild(maxBtn);
 
     // Sync state for first load/model switch
-    const defaultBetIndex = config.bets.indexOf(state.currentBet);
-    if (defaultBetIndex !== -1) {
-        state.activePaylines = paylineMap[defaultBetIndex];
-    } else {
-        state.currentBet = config.bets[0];
+    const defaultBetIndex = paylineMap.indexOf(state.activePaylines);
+    if (defaultBetIndex === -1 || (paylineMap[defaultBetIndex] * factor) !== state.currentBet) {
         state.activePaylines = paylineMap[0];
+        state.currentBet = paylineMap[0] * factor;
     }
 
     addLog(`System reconfigured: Loaded ${config.name} model architecture.`);
@@ -326,12 +332,13 @@ function openPaytable() {
         elements.paytableGrid.appendChild(jack);
     }
 
-    const paylineMapInfo = [1, 3, 5, 9];
-    const mappingHtml = config.bets.map((bet, i) => `
+    const paylineMapInfo = [1, 3, 5, 7, 9];
+    const factor = config.factor || 1;
+    const mappingHtml = paylineMapInfo.map((lines) => `
         <div class="mapping-item">
-            <span class="map-bet">${bet} tokens</span>
+            <span class="map-bet">${lines * factor} tokens</span>
             <span class="map-arrow">→</span>
-            <span class="map-lines">${paylineMapInfo[i]} Lines</span>
+            <span class="map-lines">${lines} Lines</span>
         </div>
     `).join('');
 
@@ -428,7 +435,7 @@ function getRandomLog(category) {
 
 async function spin() {
     if (state.isSpinning) return;
-    const totalCost = state.currentBet * state.activePaylines;
+    const totalCost = state.currentBet;
     
     if (state.tokens < totalCost || totalCost <= 0) {
         addLog("Inference failed: Credits depleted.", "log-loss");
@@ -542,6 +549,7 @@ function checkWin(grid) {
     let totalWin = 0;
     const config = MODEL_CONFIGS[state.currentModel];
     const winningLines = [];
+    const betPerLine = state.currentBet / state.activePaylines;
 
     for (let i = 0; i < state.activePaylines; i++) {
         const pattern = PAYLINE_PATTERNS[i];
@@ -560,7 +568,7 @@ function checkWin(grid) {
         if (matchCount >= 3) {
             const symbolPayouts = config.payouts[firstSym];
             if (symbolPayouts && symbolPayouts[matchCount] > 0) {
-                const lineWin = symbolPayouts[matchCount] * state.currentBet;
+                const lineWin = symbolPayouts[matchCount] * betPerLine;
                 totalWin += lineWin;
                 winningLines.push({index: i, count: matchCount, symbol: firstSym});
                 
@@ -593,7 +601,7 @@ function checkWin(grid) {
     } else {
         addLog(getRandomLog('loss'), "log-loss");
         elements.appContainer.classList.add('glitch-flash');
-        showFloatingFeedback(`-${(state.currentBet * state.activePaylines).toLocaleString()}`, 'loss');
+        showFloatingFeedback(`-${state.currentBet.toLocaleString()}`, 'loss');
         setTimeout(() => elements.appContainer.classList.remove('glitch-flash'), 400);
     }
 
