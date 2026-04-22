@@ -69,10 +69,10 @@
 
         <main>
             <div class="slot-machine-container">
-                <div id="jackpot-hint" class="jackpot-hint hidden">JACKPOT: 3x 💎</div>
+                <div id="jackpot-hint" class="jackpot-hint hidden">JACKPOT: 5x 💎</div>
                 <div id="win-overlay" class="win-overlay"></div>
                 <div class="slot-machine">
-                    <div class="payline"></div>
+                    <div id="paylines-layer" class="paylines-layer"></div>
                     <div class="reels-container">
                         <div class="reel" id="reel-1">
                             <div class="reel-strip"></div>
@@ -81,6 +81,12 @@
                             <div class="reel-strip"></div>
                         </div>
                         <div class="reel" id="reel-3">
+                            <div class="reel-strip"></div>
+                        </div>
+                        <div class="reel" id="reel-4">
+                            <div class="reel-strip"></div>
+                        </div>
+                        <div class="reel" id="reel-5">
                             <div class="reel-strip"></div>
                         </div>
                     </div>
@@ -94,6 +100,10 @@
                         <div id="token-balance">1,000</div>
                     </div>
                     <button id="add-tokens-btn" class="round-btn" title="Refill Compute Credits">+</button>
+                </div>
+                <div class="payline-selector">
+                    <span class="label">Paylines: <span id="payline-count">1</span></span>
+                    <input type="range" id="payline-range" min="1" max="9" value="1">
                 </div>
                 <div class="bet-controls" id="bet-container">
                     <!-- Dynamic Bet Buttons -->

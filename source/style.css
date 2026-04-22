@@ -130,20 +130,24 @@ main {
 
 .slot-machine {
     background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
-    padding: 20px;
+    padding: 15px;
     border-radius: 25px;
     border: 6px solid #2a2a2a;
     box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+    position: relative;
 }
 
-.reels-container { display: flex; gap: 10px; background: #000; padding: 10px; border-radius: 15px; }
-.reel { width: 140px; height: 240px; background: #080808; border-radius: 10px; overflow: hidden; border: 1px solid #1a1a1a; }
-.symbol { height: 80px; display: flex; justify-content: center; align-items: center; font-size: 3rem; }
-.symbol.win { animation: win-throb 0.5s ease-in-out infinite alternate; }
+.reels-container { display: flex; gap: 8px; background: #000; padding: 10px; border-radius: 15px; }
+.reel { width: 110px; height: 240px; background: #080808; border-radius: 10px; overflow: hidden; border: 1px solid #1a1a1a; position: relative; }
+.symbol { height: 80px; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; }
+.symbol.win { animation: win-throb 0.5s ease-in-out infinite alternate; position: relative; z-index: 5; }
 @keyframes win-throb { from { transform: scale(1); filter: brightness(1); } to { transform: scale(1.15); filter: brightness(1.5); } }
 
-.payline { position: absolute; top: 50%; left: 0; width: 100%; height: 3px; background: var(--accent-color); opacity: 0; pointer-events: none; }
-.payline.active { opacity: 0.8; box-shadow: 0 0 15px var(--accent-color); }
+.paylines-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+.payline-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+.payline-path { fill: none; stroke: var(--accent-color); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transition: opacity 0.3s; filter: drop-shadow(0 0 5px var(--accent-color)); }
+.payline-path.active { opacity: 0.8; animation: payline-pulse 1s infinite; }
+@keyframes payline-pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
 
 /* Controls */
 .controls {
@@ -151,12 +155,25 @@ main {
     flex-direction: column;
     gap: 12px;
     width: 100%;
-    max-width: 500px;
+    max-width: 600px;
     padding: 15px;
     background: #111;
     border-radius: 15px;
     border: 1px solid #222;
 }
+
+.payline-selector {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px;
+    background: #000;
+    border-radius: 10px;
+    border: 1px solid #333;
+}
+
+.payline-selector .label { font-size: 0.8rem; font-weight: bold; color: var(--secondary-color); min-width: 100px; }
+.payline-selector input[type="range"] { flex: 1; accent-color: var(--secondary-color); }
 
 .tokens-display { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #000; border-radius: 10px; border: 1px solid #333; }
 .balance-label { font-size: 0.65rem; color: var(--primary-color); text-transform: uppercase; }
@@ -201,8 +218,13 @@ h3 { font-size: 0.7rem; color: var(--secondary-color); margin-bottom: 8px; borde
 /* Modals */
 .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 1000; }
 .modal-content { background: #111; padding: 30px; border-radius: 20px; border: 2px solid var(--secondary-color); width: 380px; max-height: 85vh; display: flex; flex-direction: column; }
-.paytable-grid { flex: 1; overflow-y: auto; margin: 15px 0; }
-.paytable-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #222; }
+.paytable-grid { flex: 1; overflow-y: auto; margin: 15px 0; display: flex; flex-direction: column; gap: 5px; }
+.paytable-header, .paytable-item-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; align-items: center; padding: 10px; border-bottom: 1px solid #222; text-align: center; }
+.paytable-header { font-weight: bold; color: var(--primary-color); font-size: 0.7rem; text-transform: uppercase; border-bottom: 2px solid var(--primary-color); }
+.paytable-sym { font-size: 1.5rem; text-align: left; }
+.paytable-val { font-family: 'Courier New', Courier, monospace; font-weight: bold; }
+.jackpot-row { background: rgba(255, 64, 129, 0.1); border: 1px solid var(--accent-color); border-radius: 8px; margin-top: 10px; }
+.jackpot-row .paytable-sym { font-size: 1rem; color: var(--accent-color); }
 .modal-btn { width: 100%; padding: 10px; margin-top: 10px; background: var(--secondary-color); color: #fff; }
 
 .hidden { display: none; }

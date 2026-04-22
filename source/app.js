@@ -18,9 +18,19 @@ const MODEL_CONFIGS = {
     chatgpt: {
         name: "Gary (GPT)",
         symbols: ['🍕', '🍦', '🍔', '🌮', '🍩', '🎈', '🎉', '🎁', '🐶'],
-        payouts: { '🍕': 50, '🍦': 20, '🍔': 10, '🌮': 5, '🍩': 5, '🎈': 2, '🎉': 2, '🎁': 1, '🐶': 1 },
+        payouts: { 
+            '🍕': {3: 5, 4: 20, 5: 100}, 
+            '🍦': {3: 4, 4: 15, 5: 50}, 
+            '🍔': {3: 3, 4: 10, 5: 30}, 
+            '🌮': {3: 2, 4: 5, 5: 20}, 
+            '🍩': {3: 2, 4: 5, 5: 20}, 
+            '🎈': {3: 1, 4: 2, 5: 10}, 
+            '🎉': {3: 1, 4: 2, 5: 10}, 
+            '🎁': {3: 0.5, 4: 1, 5: 5}, 
+            '🐶': {3: 0.5, 4: 1, 5: 5} 
+        },
         bets: [1, 2, 5, 10],
-        winFrequency: 0.45,
+        winFrequency: 0.55,
         hasJackpot: false,
         logs: {
             spin: ["Ordering a pizza while I spin...", "Gary's here for a good time!", "Trying to make $20 last all night.", "Ooh, look at the pretty lights!"],
@@ -32,9 +42,19 @@ const MODEL_CONFIGS = {
     gemini: {
         name: "Gemini (AI)",
         symbols: ['🛸', '💎', '🧠', '🤖', '🐍', '⚡', '📉', '🔥', '🔒'],
-        payouts: { '🛸': 500, '💎': 100, '🧠': 50, '🤖': 20, '🐍': 15, '⚡': 5, '📉': 0, '🔥': 0, '🔒': 0 },
+        payouts: { 
+            '🛸': {3: 20, 4: 100, 5: 1000}, 
+            '💎': {3: 15, 4: 75, 5: 500}, 
+            '🧠': {3: 10, 4: 50, 5: 200}, 
+            '🤖': {3: 5, 4: 20, 5: 100}, 
+            '🐍': {3: 3, 4: 10, 5: 50}, 
+            '⚡': {3: 2, 4: 5, 5: 20}, 
+            '📉': {3: 0, 4: 0, 5: 0}, 
+            '🔥': {3: 0, 4: 0, 5: 0}, 
+            '🔒': {3: 0, 4: 0, 5: 0} 
+        },
         bets: [10, 20, 50, 100],
-        winFrequency: 0.25,
+        winFrequency: 0.35,
         hasJackpot: false,
         logs: {
             spin: ["Tokenizing prompt sequence...", "Executing forward pass...", "Querying vector database...", "Applying multi-head attention..."],
@@ -46,9 +66,19 @@ const MODEL_CONFIGS = {
     claude: {
         name: "Karen (Claude)",
         symbols: ['💰', '🎰', '🏦', '💎', '💳', '📊', '📈', '🏢', '⚖️'],
-        payouts: { '💰': 1000, '🎰': 500, '🏦': 200, '💎': 100, '💳': 50, '📊': 0, '📈': 0, '🏢': 0, '⚖️': 0 },
+        payouts: { 
+            '💰': {3: 100, 4: 500, 5: 5000}, 
+            '🎰': {3: 50, 4: 250, 5: 2000}, 
+            '🏦': {3: 20, 4: 100, 5: 1000}, 
+            '💎': {3: 10, 4: 50, 5: 500}, 
+            '💳': {3: 5, 4: 20, 5: 200}, 
+            '📊': {3: 0, 4: 0, 5: 0}, 
+            '📈': {3: 0, 4: 0, 5: 0}, 
+            '🏢': {3: 0, 4: 0, 5: 0}, 
+            '⚖️': {3: 0, 4: 0, 5: 0} 
+        },
         bets: [100, 200, 500, 1000],
-        winFrequency: 0.12,
+        winFrequency: 0.15,
         hasJackpot: true,
         logs: {
             spin: ["I need to see the manager of this RNG.", "This machine better be 'loose'.", "All in. I don't have time for small talk.", "Where's my high-roller suite?"],
@@ -63,6 +93,7 @@ const MODEL_CONFIGS = {
 let state = {
     tokens: 1000,
     currentBet: 10,
+    activePaylines: 1,
     jackpot: 100000,
     isSpinning: false,
     autoPlay: false,
@@ -72,6 +103,18 @@ let state = {
     settings: { volume: 0.5 }
 };
 
+const PAYLINE_PATTERNS = [
+    [1, 1, 1, 1, 1], // 1: Middle
+    [0, 0, 0, 0, 0], // 2: Top
+    [2, 2, 2, 2, 2], // 3: Bottom
+    [0, 1, 2, 1, 0], // 4: V-shape
+    [2, 1, 0, 1, 2], // 5: Inverted V
+    [0, 0, 1, 2, 2], // 6: Staircase Down
+    [2, 2, 1, 0, 0], // 7: Staircase Up
+    [1, 0, 1, 2, 1], // 8: Zig-zag
+    [1, 2, 1, 0, 1]  // 9: Inverted Zig-zag
+];
+
 let displayTokens = state.tokens;
 
 // DOM Elements
@@ -80,15 +123,20 @@ const elements = {
     slotMachine: document.querySelector('.slot-machine'),
     winOverlay: document.getElementById('win-overlay'),
     jackpotDisplay: document.getElementById('jackpot-display'),
+    paylinesLayer: document.getElementById('paylines-layer'),
     reels: [
         document.querySelector('#reel-1 .reel-strip'),
         document.querySelector('#reel-2 .reel-strip'),
-        document.querySelector('#reel-3 .reel-strip')
+        document.querySelector('#reel-3 .reel-strip'),
+        document.querySelector('#reel-4 .reel-strip'),
+        document.querySelector('#reel-5 .reel-strip')
     ],
     reelContainers: [
         document.getElementById('reel-1'),
         document.getElementById('reel-2'),
-        document.getElementById('reel-3')
+        document.getElementById('reel-3'),
+        document.getElementById('reel-4'),
+        document.getElementById('reel-5')
     ],
     tokenBalance: document.getElementById('token-balance'),
     jackpotTicker: document.getElementById('jackpot-ticker'),
@@ -96,6 +144,8 @@ const elements = {
     autoBtn: document.getElementById('auto-btn'),
     betContainer: document.getElementById('bet-container'),
     addTokensBtn: document.getElementById('add-tokens-btn'),
+    paylineRange: document.getElementById('payline-range'),
+    paylineCount: document.getElementById('payline-count'),
     logs: document.getElementById('game-logs'),
     statSpins: document.getElementById('stat-spins'),
     jackpotHint: document.getElementById('jackpot-hint'),
@@ -189,27 +239,91 @@ function setModel(modelId) {
     updateUI(true);
 }
 
+// Payline Visualization
+function drawPaylines() {
+    const container = elements.paylinesLayer;
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    
+    // SVG Setup
+    let svg = container.querySelector('svg');
+    if (!svg) {
+        svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute('class', 'payline-svg');
+        container.appendChild(svg);
+    }
+    svg.innerHTML = '';
+
+    const reelWidth = 110 + 8; // width + gap
+    const symbolHeight = 80;
+    const paddingX = 15 + 10; // slot-machine padding + reels-container padding
+    const paddingY = 15 + 10;
+
+    PAYLINE_PATTERNS.forEach((pattern, idx) => {
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        let d = "";
+        
+        pattern.forEach((rowIdx, reelIdx) => {
+            const x = paddingX + (reelIdx * reelWidth) + (110 / 2);
+            const y = paddingY + (rowIdx * symbolHeight) + (symbolHeight / 2);
+            d += (reelIdx === 0 ? "M" : "L") + `${x} ${y}`;
+        });
+
+        path.setAttribute('d', d);
+        path.setAttribute('class', `payline-path line-${idx}`);
+        path.id = `payline-${idx}`;
+        svg.appendChild(path);
+    });
+}
+
+function updatePaylineDisplay() {
+    state.activePaylines = parseInt(elements.paylineRange.value);
+    elements.paylineCount.textContent = state.activePaylines;
+    
+    // Highlight active lines briefly
+    document.querySelectorAll('.payline-path').forEach((path, idx) => {
+        path.classList.toggle('active', idx < state.activePaylines);
+    });
+    
+    setTimeout(() => {
+        if (!state.isSpinning) {
+            document.querySelectorAll('.payline-path').forEach(path => path.classList.remove('active'));
+        }
+    }, 1000);
+}
+
 // Paytable Logic
 function openPaytable() {
     const config = MODEL_CONFIGS[state.currentModel];
     elements.paytableTitle.textContent = `${config.name} Payouts`;
-    elements.paytableGrid.innerHTML = '';
+    elements.paytableGrid.innerHTML = `
+        <div class="paytable-header">
+            <span>Symbol</span>
+            <span>3x</span>
+            <span>4x</span>
+            <span>5x</span>
+        </div>
+    `;
     
-    Object.entries(config.payouts).forEach(([sym, mult]) => {
+    Object.entries(config.payouts).forEach(([sym, mults]) => {
         const item = document.createElement('div');
-        item.className = 'paytable-item';
+        item.className = 'paytable-item-row';
         item.innerHTML = `
             <span class="paytable-sym">${sym}</span>
-            <span class="paytable-val">${mult > 0 ? 'x' + mult : 'Hallucination'}</span>
+            <span class="paytable-val">${mults[3] > 0 ? 'x' + mults[3] : '-'}</span>
+            <span class="paytable-val">${mults[4] > 0 ? 'x' + mults[4] : '-'}</span>
+            <span class="paytable-val">${mults[5] > 0 ? 'x' + mults[5] : '-'}</span>
         `;
         elements.paytableGrid.appendChild(item);
     });
 
     if (config.hasJackpot) {
         const jack = document.createElement('div');
-        jack.className = 'paytable-item';
-        jack.style.borderTop = '2px solid var(--accent-color)';
-        jack.innerHTML = `<span class="paytable-sym">💰💰💰</span><span class="paytable-val">1M JACKPOT</span>`;
+        jack.className = 'paytable-item-row jackpot-row';
+        jack.innerHTML = `
+            <span class="paytable-sym">💎💎💎💎💎</span>
+            <span class="paytable-val" style="grid-column: span 3">1M JACKPOT</span>
+        `;
         elements.paytableGrid.appendChild(jack);
     }
     elements.paytableModal.classList.remove('hidden');
@@ -227,6 +341,7 @@ function updateUI(instant = false) {
     elements.statSpins.textContent = state.stats.spins;
     elements.statWon.textContent = state.stats.won.toLocaleString();
     elements.statMissions.textContent = `${state.stats.missions}/3`;
+    drawPaylines();
 }
 
 function animateTokenCount() {
@@ -269,7 +384,7 @@ function initReels() {
     const symbols = MODEL_CONFIGS[state.currentModel].symbols;
     elements.reels.forEach(reel => {
         reel.innerHTML = '';
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < 30; i++) {
             const sym = document.createElement('div');
             sym.className = 'symbol';
             sym.textContent = symbols[Math.floor(Math.random() * symbols.length)];
@@ -293,7 +408,9 @@ function getRandomLog(category) {
 
 async function spin() {
     if (state.isSpinning) return;
-    if (state.tokens < state.currentBet || state.currentBet <= 0) {
+    const totalCost = state.currentBet * state.activePaylines;
+    
+    if (state.tokens < totalCost || totalCost <= 0) {
         addLog("Inference failed: Credits depleted.", "log-loss");
         state.autoPlay = false;
         elements.autoBtn.classList.remove('active');
@@ -301,112 +418,137 @@ async function spin() {
     }
 
     state.isSpinning = true;
-    state.tokens -= state.currentBet;
-    state.jackpot += state.currentBet * 0.1;
+    state.tokens -= totalCost;
+    state.jackpot += totalCost * 0.05;
     state.stats.spins++;
     updateUI();
     playSound(200, 'square', 0.05);
     addLog(getRandomLog('spin'));
 
+    // Clear previous wins
+    document.querySelectorAll('.payline-path').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.symbol.win').forEach(s => s.classList.remove('win'));
+
     const config = MODEL_CONFIGS[state.currentModel];
-    const isWin = Math.random() < config.winFrequency;
-    const results = [];
     
-    if (isWin) {
-        const winSym = config.symbols[Math.floor(Math.random() * 4)];
-        results.push(winSym, winSym, winSym);
-    } else {
-        while (results.length < 3) {
-            const s = config.symbols[Math.floor(Math.random() * config.symbols.length)];
-            results.push(s);
-            if (results.length === 3 && results[0] === results[1] && results[1] === results[2]) {
-                results[2] = config.symbols[(config.symbols.indexOf(s) + 1) % config.symbols.length];
-            }
+    // Generate 5x3 Result Grid
+    const grid = [];
+    for (let r = 0; r < 5; r++) {
+        const reelResults = [];
+        for (let row = 0; row < 3; row++) {
+            reelResults.push(config.symbols[Math.floor(Math.random() * config.symbols.length)]);
         }
+        grid.push(reelResults);
     }
 
     const reelPromises = elements.reels.map((reel, i) => {
         return new Promise(resolve => {
-            let spinDuration = 2000 + (i * 600);
-            // Faster spinning for ChatGPT model to match Gary's "For-Fun" fast-paced playstyle
-            if (state.currentModel === 'chatgpt') {
-                spinDuration = 800 + (i * 200);
-            }
+            let spinDuration = 1500 + (i * 400);
+            if (state.currentModel === 'chatgpt') spinDuration = 600 + (i * 150);
+            
             const symbolHeight = 80;
             reel.classList.add('spinning');
             
-            const stopHandler = () => {
-                if (reel.classList.contains('spinning')) {
-                    reel.style.transitionDuration = '200ms';
-                    playSound(600, 'sine', 0.05);
-                }
-            };
-            elements.reelContainers[i].addEventListener('click', stopHandler);
-
             reel.ontransitionend = () => {
                 reel.classList.remove('spinning');
                 reel.style.transition = 'none';
                 reel.innerHTML = '';
-                for (let j = 0; j < 20; j++) {
+                for (let j = 0; j < 30; j++) {
                     const sym = document.createElement('div');
                     sym.className = 'symbol';
-                    sym.textContent = j === 1 ? results[i] : config.symbols[Math.floor(Math.random() * config.symbols.length)];
+                    if (j < 3) {
+                        sym.textContent = grid[i][j];
+                    } else {
+                        sym.textContent = config.symbols[Math.floor(Math.random() * config.symbols.length)];
+                    }
                     reel.appendChild(sym);
                 }
-                reel.style.transform = `translateY(-${symbolHeight}px)`;
+                reel.style.transform = `translateY(0px)`;
                 playSound(400 + (i * 100), 'sine', 0.1);
-                elements.reelContainers[i].removeEventListener('click', stopHandler);
                 resolve();
             };
 
             reel.style.transition = `transform ${spinDuration}ms cubic-bezier(0.45, 0.05, 0.55, 0.95)`;
-            const stopIdx = config.symbols.indexOf(results[i]);
-            const totalShift = (20 * symbolHeight) + (stopIdx * symbolHeight);
+            const totalShift = (27 * symbolHeight);
             reel.style.transform = `translateY(-${totalShift}px)`;
         });
     });
 
     await Promise.all(reelPromises);
-    checkWin(results);
+    checkWin(grid);
     state.isSpinning = false;
     if (state.autoPlay) setTimeout(spin, 1500);
 }
 
-function checkWin(results) {
-    const [r1, r2, r3] = results;
-    let winAmount = 0;
+function checkWin(grid) {
+    let totalWin = 0;
     const config = MODEL_CONFIGS[state.currentModel];
+    const winningLines = [];
 
-    if (r1 === r2 && r2 === r3) {
-        const basePayout = config.payouts[r1] || 0;
-        winAmount = basePayout * state.currentBet;
+    for (let i = 0; i < state.activePaylines; i++) {
+        const pattern = PAYLINE_PATTERNS[i];
+        const lineSymbols = pattern.map((rowIdx, reelIdx) => grid[reelIdx][rowIdx]);
         
-        if (config.hasJackpot && r1 === '💎') {
-            winAmount += state.jackpot;
+        let matchCount = 1;
+        const firstSym = lineSymbols[0];
+        for (let j = 1; j < 5; j++) {
+            if (lineSymbols[j] === firstSym) {
+                matchCount++;
+            } else {
+                break;
+            }
+        }
+
+        if (matchCount >= 3) {
+            const symbolPayouts = config.payouts[firstSym];
+            if (symbolPayouts && symbolPayouts[matchCount] > 0) {
+                const lineWin = symbolPayouts[matchCount] * state.currentBet;
+                totalWin += lineWin;
+                winningLines.push({index: i, count: matchCount, symbol: firstSym});
+                
+                pattern.forEach((rowIdx, reelIdx) => {
+                    if (reelIdx < matchCount) {
+                        const symbolEl = elements.reels[reelIdx].querySelectorAll('.symbol')[rowIdx];
+                        if (symbolEl) symbolEl.classList.add('win');
+                    }
+                });
+            }
+        }
+    }
+
+    if (totalWin > 0) {
+        const jackpotWin = winningLines.find(w => w.count === 5 && w.symbol === '💎');
+        if (config.hasJackpot && jackpotWin) {
+            totalWin += state.jackpot;
             state.jackpot = 1000000;
             elements.slotMachine.classList.add('big-win-glow');
-            showFloatingFeedback(`ULTIMATE JACKPOT!!! +${winAmount.toLocaleString()}`, 'win');
+            showFloatingFeedback(`ULTIMATE JACKPOT!!! +${totalWin.toLocaleString()}`, 'win');
         } else {
-            showFloatingFeedback(`+${winAmount.toLocaleString()} (x${basePayout})`, 'win');
+            showFloatingFeedback(`+${totalWin.toLocaleString()}`, 'win');
         }
-        handleWinUI(r1, winAmount);
+        
+        winningLines.forEach(w => {
+            document.getElementById(`payline-${w.index}`).classList.add('active');
+        });
+
+        handleWinUI(totalWin);
     } else {
         addLog(getRandomLog('loss'), "log-loss");
         elements.appContainer.classList.add('glitch-flash');
-        showFloatingFeedback(`-${state.currentBet.toLocaleString()}`, 'loss');
+        showFloatingFeedback(`-${(state.currentBet * state.activePaylines).toLocaleString()}`, 'loss');
         setTimeout(() => elements.appContainer.classList.remove('glitch-flash'), 400);
     }
 
-    if (winAmount > 0) {
-        state.tokens += winAmount;
-        state.stats.won += winAmount;
+    if (totalWin > 0) {
+        state.tokens += totalWin;
+        state.stats.won += totalWin;
         state.lossStreak = 0;
     } else {
         state.lossStreak++;
     }
 
     setTimeout(() => {
-        document.querySelector('.payline').classList.remove('active');
+        document.querySelectorAll('.payline-path').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.symbol.win').forEach(s => s.classList.remove('win'));
         elements.slotMachine.classList.remove('big-win-glow');
     }, 2500);
@@ -414,16 +556,10 @@ function checkWin(results) {
     updateUI();
 }
 
-function handleWinUI(symbol, winAmount) {
+function handleWinUI(winAmount) {
     elements.appContainer.classList.add('win-flash');
     setTimeout(() => elements.appContainer.classList.remove('win-flash'), 1000);
-    document.querySelector('.payline').classList.add('active');
     
-    elements.reels.forEach(reel => {
-        const centerSymbol = reel.querySelectorAll('.symbol')[1];
-        if (centerSymbol) centerSymbol.classList.add('win');
-    });
-
     addLog(`${getRandomLog('win')} Received ${winAmount.toLocaleString()} tokens.`, "log-win");
     playSound(800, 'triangle', 0.4);
 }
@@ -449,6 +585,7 @@ elements.closeSettings.addEventListener('click', () => elements.settingsModal.cl
 elements.paytableBtn.addEventListener('click', openPaytable);
 elements.closePaytable.addEventListener('click', () => elements.paytableModal.classList.add('hidden'));
 elements.volumeSlider.addEventListener('input', (e) => state.settings.volume = parseFloat(e.target.value));
+elements.paylineRange.addEventListener('input', updatePaylineDisplay);
 
 setInterval(() => {
     if (!state.isSpinning && Math.random() > 0.8) addLog(getRandomLog('idle'));

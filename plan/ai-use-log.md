@@ -227,11 +227,11 @@ For each of the different models they should have thier own personality for the 
 **Hand-edits:** N/A
 
 ---
-## Iteration 16 - [---]
+## Iteration 16 - [Expanding Reels and Paylines]
 
-**Prompt:** 
+**Prompt:** For every slot machine mode, change the slot machine to have 5 reels and add more paylines. The paylines can be diagonal, zig-zag, or pyramid shaped. Also add a UI option for the user to select how many paylines they would like to use. Finally also add an screen users can click to see winning combinations and payouts.  
 
-**Outcome:** TBD
+**Outcome:** Successfully added more reels and paylines, along with a paytable. SPin button is now cut off though. I would like to further improve the UI.
 
 **Hand-edits:** TBD
 
