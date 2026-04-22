@@ -1,4 +1,4 @@
-# Final Report: Using AI for Engineering Development
+# Final Report: Using AI for Slot Machine Development
 
 ## Introduction
 This project was mainly about exploring whether AI can work as a development tool to help build a more complete web application. The project we created was an AI-themed slot machine website with a humorous “AI mockery” style, using vanilla HTML, CSS, JavaScript, and platform APIs. From the beginning, the goal was not just to make a game that technically worked, but to make something that looked more interesting, had a clear theme, and felt enjoyable for different types of users.
@@ -15,27 +15,27 @@ I think this strategy mattered a lot because it kept the project manageable. Ins
 ## Development Process
 The biggest characteristic of this project was how iterative it was. According to the development log, the project went through 23 iterations. During those iterations, AI was used to generate code, fix bugs, improve the interface, refactor logic, and expand the overall game experience.
 
-### Phase 1: Initial Build
+### Phase 1: Initial Build (iteration 1)
 The first iteration focused on getting the project started. AI generated the three main files, `app.js`, `index.html`, and `style.css`, and implemented the basic structure of the game. This included features like betting, logs, themes, statistics, and an auto-spin style feature. In other words, the first version successfully created the foundation of the slot machine app.
 
 At the same time, the first version had several obvious problems. There was no way to add more tokens into the game. The auto-optimize feature could keep running even when the player had no tokens left. The user interface did not look very polished. Also, even though the personas and user stories were included in the original prompt, they were not really reflected in the actual gameplay. This phase showed an important reality of AI-based development: AI can produce a working prototype quickly, but that first output is usually still far from matching the full design intention.
 
-### Phase 2: Stability and Code Quality
+### Phase 2: Stability and Code Quality (iteration 2)
 The second phase was mainly about fixing bugs and cleaning up the code. At this point, the focus was no longer just “make it work,” but “make it work more reliably and make the code easier to understand.” Problems related to token handling and auto-bet behavior were fixed during this stage. The prompt for this phase also clearly asked AI to improve the code through linting, JSDoc comments, documentation, and cleaner structure.
 
 Later on, there was also another iteration that returned to code readability and expandability, asking AI to improve the organization without changing the logic too much. I think this phase is important because it shows that AI is not only useful for creating new features. It can also help with refactoring and cleanup. However, that only works well when the prompt is specific. If the request is too broad, like just saying “make the code cleaner,” the result may look more organized on the surface without actually improving the structure very much.
 
-### Phase 3: Theme and Experience Design
+### Phase 3: Theme and Experience Design (iteration 3 - 6)
 The third phase focused on strengthening the project’s style and overall experience so that it felt like more than just a normal slot machine. This phase added more AI-related symbols, emojis, and logs. It also added animations, sound effects, visual feedback, glowing effects, casino-style buttons, and an animated gradient background. Overall, these iterations were about giving the application more personality and making it more visually appealing.
 
 This was one area where AI seemed especially helpful. A prompt like “make it feel more like a casino while still keeping the AI theme” is pretty abstract, and if I had done that manually from scratch, it probably would have taken more time to experiment with ideas. AI’s advantage here was that it could quickly generate a visible version of that idea, which then made it easier to judge whether the direction worked or needed more changes. So in terms of style, mood, and UX experimentation, AI was clearly useful.
 
-### Phase 4: Persona-Based Expansion
+### Phase 4: Persona-Based Expansion (iteration 7)
 The fourth phase was an important turning point because the project started to move beyond visual changes and began turning the personas into actual gameplay differences. At this point, the game was expanded into three separate modes: ChatGPT, Gemini, and Claude. Each mode was designed around a different difficulty level and user style.
 
 Claude mode was aimed more at Karen’s type of player, with higher volatility, higher stakes, and a jackpot feature. ChatGPT mode was more like Gary’s style, with more frequent wins and a more relaxed experience. Gemini was positioned in the middle as a medium-difficulty option. On top of different payout structures and pacing, each mode also had its own theme, emojis, logs, and overall feeling. This phase showed that the personas were no longer just ideas in the planning document. They were actually turned into mechanics inside the game.
 
-### Phase 5: Advanced Feature Expansion
+### Phase 5: Advanced Feature Expansion (iteration 8 - 23)
 The fifth phase covered all of the later iterations where the project became much more complex and polished. At this point, the game was no longer a simple slot machine prototype. It was being expanded into a fuller system with more features and more customization. These later iterations added payout information, modal pop-ups, more refined button styling, background and color changes, mode-specific spin speeds, Claude’s jackpot rules, more reels and paylines, a paytable, missions, language settings, sound customization, and more environment controls.
 
 At the same time, this phase also showed one of the biggest weaknesses of AI-assisted development: the more features were added, the easier it became for old bugs to come back. Some layout problems had already been fixed before, but returned after new features were introduced. Issues like neural logs pushing the page downward, buttons getting cut off, and the page no longer fitting on one screen happened more than once. In other words, AI was good at rapidly adding features, but not always good at preserving earlier fixes in a consistent way. That is why many of the later iterations involved both adding new features and re-fixing older problems.
@@ -106,7 +106,7 @@ Even when the generated code looked correct, the process log showed recurring su
 In other words, AI helped most when it was treated like a fast, flexible collaborator whose work needed supervision, verification, and direction.
 
 ## Lessons Learned
-Several practical lessons emerged from the project:
+We have drawn several practical lessons from this project:
 
 - Start with a small scope and build outward. This made the project manageable and helped isolate issues early.
 - Keep prompts specific. The best outputs came from precise instructions with clear constraints.
@@ -116,7 +116,7 @@ Several practical lessons emerged from the project:
 - Do not assume “working” means “finished.” A feature may technically function while still being weak from a UX or design standpoint.
 
 ## Conclusion
-This project demonstrated that engineering with AI can be highly productive, especially for rapid prototyping, iterative feature development, and interface experimentation. The AI significantly accelerated development of the slot machine application and helped transform a simple starting concept into a more complex and engaging final product.
+This slot machine project demonstrated that engineering with AI can be highly productive, especially for rapid prototyping, iterative feature development, and interface experimentation. The AI significantly accelerated development of the slot machine application and helped transform a simple starting concept into a more complex and engaging final product.
 
 At the same time, the process showed that AI is not a fully reliable autonomous engineer. It can misunderstand intent, reintroduce old bugs, and require repeated correction as complexity increases. The most effective workflow was not “ask once and accept the result,” but rather a cycle of prompting, evaluating, refining, and testing.
 
