@@ -254,13 +254,16 @@ For each of the different models they should have thier own personality for the 
 **Hand-edits:** N/A
 
 ---
-## Iteration 19 - [---]
+## Iteration 19 - [Payline-Betsize Bug / Feature Branch]
 
-**Prompt:** 
+**Prompt:** With the addition of new paylines, there's a bug where the slot machine doesn't allow you to use the max bet size with a number of paylines greater than 1. I suspect this is because the bet size is being multipled by the paylines. Can you change the game logic and UI so that: 
+1. The bet size and paylines are dependent, meaning changing the bet size changes the paylines. And I can't change them independently.
+2. As a consequence of feature 1, the max bet size automatically selects the maximum number of paylines by balance can afford.
+3. Remove the payline slider, but keep the bet size UI. Add to the paytable a visual that increasing the bet size increases the paylines.
 
-**Outcome:** TBD
+**Outcome:** The max bet button works now since it divides the max bet by the max number of paylines (9). But for the other bet sizes it is still multiplying the paylines by the betsize. Which is not the correct logic.
 
-**Hand-edits:** TBD
+**Hand-edits:** N/A
 
 ---
 ## Iteration 20 - [---]

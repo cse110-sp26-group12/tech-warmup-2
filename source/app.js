@@ -144,8 +144,6 @@ const elements = {
     autoBtn: document.getElementById('auto-btn'),
     betContainer: document.getElementById('bet-container'),
     addTokensBtn: document.getElementById('add-tokens-btn'),
-    paylineRange: document.getElementById('payline-range'),
-    paylineCount: document.getElementById('payline-count'),
     logs: document.getElementById('game-logs'),
     statSpins: document.getElementById('stat-spins'),
     jackpotHint: document.getElementById('jackpot-hint'),
@@ -200,15 +198,18 @@ function setModel(modelId) {
     
     // Update Bet Buttons
     elements.betContainer.innerHTML = '';
-    config.bets.forEach(amount => {
+    const paylineMap = [1, 3, 5, 9];
+    config.bets.forEach((amount, index) => {
         const btn = document.createElement('button');
         btn.className = 'bet-btn';
-        if (amount === state.currentBet) btn.classList.add('active');
+        if (amount === state.currentBet && state.activePaylines === paylineMap[index]) btn.classList.add('active');
         btn.textContent = amount;
         btn.onclick = () => {
             document.querySelectorAll('.bet-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             state.currentBet = amount;
+            state.activePaylines = paylineMap[index];
+            updateUI();
             playSound(800, 'sine', 0.05);
         };
         elements.betContainer.appendChild(btn);
@@ -221,17 +222,29 @@ function setModel(modelId) {
     maxBtn.onclick = () => {
         document.querySelectorAll('.bet-btn').forEach(b => b.classList.remove('active'));
         maxBtn.classList.add('active');
-        // ALL IN: Bet entire account balance
-        state.currentBet = state.tokens > 0 ? state.tokens : config.bets[0];
-        addLog(`ALL IN: ${state.currentBet.toLocaleString()} tokens staked!`);
+        
+        // Select max paylines affordable
+        if (state.tokens >= 9) state.activePaylines = 9;
+        else if (state.tokens >= 5) state.activePaylines = 5;
+        else if (state.tokens >= 3) state.activePaylines = 3;
+        else state.activePaylines = 1;
+        
+        state.currentBet = Math.floor(state.tokens / state.activePaylines);
+        if (state.currentBet <= 0) state.currentBet = state.tokens > 0 ? 1 : config.bets[0];
+        
+        addLog(`ALL IN: ${state.currentBet.toLocaleString()} per line on ${state.activePaylines} lines!`);
+        updateUI();
         playSound(1000, 'sine', 0.1);
     };
     elements.betContainer.appendChild(maxBtn);
 
-    if (!config.bets.includes(state.currentBet) && state.currentBet !== state.tokens) {
+    // Sync state for first load/model switch
+    const defaultBetIndex = config.bets.indexOf(state.currentBet);
+    if (defaultBetIndex !== -1) {
+        state.activePaylines = paylineMap[defaultBetIndex];
+    } else {
         state.currentBet = config.bets[0];
-        const firstBtn = elements.betContainer.querySelector('.bet-btn');
-        if (firstBtn) firstBtn.classList.add('active');
+        state.activePaylines = paylineMap[0];
     }
 
     addLog(`System reconfigured: Loaded ${config.name} model architecture.`);
@@ -278,16 +291,6 @@ function drawPaylines() {
     });
 }
 
-function updatePaylineDisplay() {
-    state.activePaylines = parseInt(elements.paylineRange.value);
-    elements.paylineCount.textContent = state.activePaylines;
-    
-    // Highlight active lines and KEEP them visible
-    document.querySelectorAll('.payline-path').forEach((path, idx) => {
-        path.classList.toggle('active', idx < state.activePaylines);
-    });
-}
-
 // Paytable Logic
 function openPaytable() {
     const config = MODEL_CONFIGS[state.currentModel];
@@ -322,6 +325,27 @@ function openPaytable() {
         `;
         elements.paytableGrid.appendChild(jack);
     }
+
+    const paylineMapInfo = [1, 3, 5, 9];
+    const mappingHtml = config.bets.map((bet, i) => `
+        <div class="mapping-item">
+            <span class="map-bet">${bet} tokens</span>
+            <span class="map-arrow">→</span>
+            <span class="map-lines">${paylineMapInfo[i]} Lines</span>
+        </div>
+    `).join('');
+
+    const paylineVisual = document.createElement('div');
+    paylineVisual.className = 'payline-mapping-container';
+    paylineVisual.innerHTML = `
+        <h3>Neural Path Scaling</h3>
+        <div class="mapping-grid">
+            ${mappingHtml}
+        </div>
+        <p class="mapping-note">Larger bets activate more neural pathways (paylines).</p>
+    `;
+    elements.paytableGrid.appendChild(paylineVisual);
+
     elements.paytableModal.classList.remove('hidden');
 }
 
@@ -613,7 +637,6 @@ elements.closeSettings.addEventListener('click', () => elements.settingsModal.cl
 elements.paytableBtn.addEventListener('click', openPaytable);
 elements.closePaytable.addEventListener('click', () => elements.paytableModal.classList.add('hidden'));
 elements.volumeSlider.addEventListener('input', (e) => state.settings.volume = parseFloat(e.target.value));
-elements.paylineRange.addEventListener('input', updatePaylineDisplay);
 
 setInterval(() => {
     if (!state.isSpinning && Math.random() > 0.8) addLog(getRandomLog('idle'));

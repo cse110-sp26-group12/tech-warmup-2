@@ -229,6 +229,49 @@ h3 { font-size: 0.7rem; color: var(--secondary-color); margin-bottom: 8px; borde
 .jackpot-row .paytable-sym { font-size: 1rem; color: var(--accent-color); }
 .modal-btn { width: 100%; padding: 10px; margin-top: 10px; background: var(--secondary-color); color: #fff; }
 
+/* Payline Mapping Visuals */
+.payline-mapping-container {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(124, 77, 255, 0.05);
+    border: 1px solid rgba(124, 77, 255, 0.2);
+    border-radius: 12px;
+}
+
+.payline-mapping-container h3 {
+    text-align: center;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+}
+
+.mapping-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
+.mapping-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.85rem;
+}
+
+.map-bet { color: #fff; width: 80px; text-align: right; }
+.map-arrow { color: var(--secondary-color); font-weight: bold; }
+.map-lines { color: var(--primary-color); width: 80px; text-align: left; }
+
+.mapping-note {
+    font-size: 0.7rem;
+    color: #666;
+    text-align: center;
+    margin-top: 10px;
+    font-style: italic;
+}
+
 .hidden { display: none; }
 
 footer { grid-area: footer; text-align: center; padding-top: 5px; }
