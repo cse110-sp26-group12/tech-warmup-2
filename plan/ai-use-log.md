@@ -189,7 +189,21 @@ For each of the different models they should have thier own personality for the 
 
 **Worked / didn't work:** no errors
 
-**Hand-edits:** None
-
 ---
 
+## Iteration 12 - [Color Changes]
+
+**Prompt:** Keep everything the same, this includes the format of the slot machine, the different gamemodes, the buttons, the currency, etc. However, can you change the colors of the background and border-colors of the slot machine so it isn't boring. Give the slot machine more life with colors.
+
+**Outcome:** TBD
+
+**Hand-edits:** TBD
+
+---
+## Iteration 13 - [---]
+
+**Prompt:** TBD
+
+**Outcome:** TBD
+
+**Hand-edits:** TBD
