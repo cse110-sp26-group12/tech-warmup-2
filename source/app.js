@@ -98,8 +98,19 @@ let state = {
     isSpinning: false,
     autoPlay: false,
     lossStreak: 0,
+    winStreak: 0,
     currentModel: 'gemini',
-    stats: { spins: 0, won: 0, missions: 0 },
+    stats: { 
+        spins: 0, 
+        won: 0, 
+        missions: 0,
+        missionProgress: {
+            spins_10: 0,
+            diamonds_15: 0,
+            win_streak_3: 0
+        },
+        completedMissions: []
+    },
     settings: { 
         volume: 0.5,
         language: 'en',
@@ -109,6 +120,12 @@ let state = {
         flipped: false
     }
 };
+
+const MISSIONS = [
+    { id: 'spins_10', desc: 'Execute 10 model inferences', target: 10, reward: 500, type: 'spins' },
+    { id: 'diamonds_15', desc: 'Identify 15 diamond artifacts', target: 15, reward: 1000, type: 'symbol', symbol: '💎' },
+    { id: 'win_streak_3', desc: 'Achieve 3 consecutive valid outputs', target: 3, reward: 750, type: 'streak' }
+];
 
 const PAYLINE_PATTERNS = [
     [1, 1, 1, 1, 1], // 1: Middle
@@ -152,6 +169,7 @@ const elements = {
     betContainer: document.getElementById('bet-container'),
     addTokensBtn: document.getElementById('add-tokens-btn'),
     logs: document.getElementById('game-logs'),
+    missionsList: document.getElementById('missions-list'),
     statSpins: document.getElementById('stat-spins'),
     jackpotHint: document.getElementById('jackpot-hint'),
     statWon: document.getElementById('stat-won'),
@@ -418,6 +436,75 @@ function updateMachineColor() {
     elements.slotMachine.style.borderColor = state.settings.machineColor;
 }
 
+function updateMissionsUI() {
+    if (!elements.missionsList) return;
+    elements.missionsList.innerHTML = '';
+    let completedCount = 0;
+    
+    MISSIONS.forEach(mission => {
+        const progress = state.stats.missionProgress[mission.id];
+        const isCompleted = state.stats.completedMissions.includes(mission.id);
+        if (isCompleted) completedCount++;
+        
+        const item = document.createElement('div');
+        item.className = `mission-item ${isCompleted ? 'completed' : ''}`;
+        
+        const percent = Math.min((progress / mission.target) * 100, 100);
+        
+        item.innerHTML = `
+            <div class="mission-header">
+                <span>MISSION: ${mission.id.toUpperCase()}</span>
+                <span class="mission-reward">+${mission.reward}</span>
+            </div>
+            <div class="mission-desc">${mission.desc}</div>
+            <div class="mission-progress-bar">
+                <div class="mission-progress-fill" style="width: ${percent}%"></div>
+            </div>
+            <div class="mission-status" style="font-size: 0.6rem; margin-top: 4px; text-align: right; color: #666;">
+                ${isCompleted ? 'STABILIZED' : `${progress}/${mission.target}`}
+            </div>
+        `;
+        elements.missionsList.appendChild(item);
+    });
+    
+    state.stats.missions = completedCount;
+    elements.statMissions.textContent = `${completedCount}/${MISSIONS.length}`;
+}
+
+function checkMissionProgress(type, value = 1) {
+    MISSIONS.forEach(mission => {
+        if (state.stats.completedMissions.includes(mission.id)) return;
+
+        let updated = false;
+        if (mission.type === type) {
+            if (type === 'symbol') {
+                if (mission.symbol === value) {
+                    state.stats.missionProgress[mission.id]++;
+                    updated = true;
+                }
+            } else if (type === 'spins' || type === 'streak') {
+                state.stats.missionProgress[mission.id] = value;
+                updated = true;
+            }
+        }
+
+        if (updated && state.stats.missionProgress[mission.id] >= mission.target) {
+            completeMission(mission);
+        }
+    });
+    updateMissionsUI();
+}
+
+function completeMission(mission) {
+    if (state.stats.completedMissions.includes(mission.id)) return;
+    state.stats.completedMissions.push(mission.id);
+    state.tokens += mission.reward;
+    addLog(`MISSION ACCOMPLISHED: ${mission.id}. Reward: +${mission.reward} tokens.`, "log-win");
+    showFloatingFeedback(`MISSION CLEAR: +${mission.reward}`, 'win');
+    playSound(1200, 'triangle', 0.5);
+    updateUI();
+}
+
 // UI Updates
 function updateUI(instant = false) {
     if (instant) {
@@ -429,8 +516,8 @@ function updateUI(instant = false) {
     elements.jackpotTicker.textContent = Math.floor(state.jackpot).toLocaleString();
     elements.statSpins.textContent = state.stats.spins;
     elements.statWon.textContent = state.stats.won.toLocaleString();
-    elements.statMissions.textContent = `${state.stats.missions}/3`;
     
+    updateMissionsUI();
     updateLanguage();
     updateMachineColor();
     
@@ -492,7 +579,18 @@ function initReels() {
 function addLog(msg, type = '') {
     const entry = document.createElement('div');
     entry.className = `log-entry ${type}`;
-    entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+    
+    const time = document.createElement('span');
+    time.className = 'log-time';
+    time.textContent = `[${new Date().toLocaleTimeString()}]`;
+    
+    const text = document.createElement('span');
+    text.className = 'log-msg';
+    text.textContent = msg;
+    
+    entry.appendChild(time);
+    entry.appendChild(text);
+    
     elements.logs.prepend(entry);
     if (elements.logs.childNodes.length > 50) elements.logs.lastChild.remove();
 }
@@ -517,6 +615,7 @@ async function spin() {
     state.tokens -= totalCost;
     state.jackpot += totalCost * 0.05;
     state.stats.spins++;
+    checkMissionProgress('spins', state.stats.spins);
     updateUI();
     playSound(200, 'square', 0.05);
     addLog(getRandomLog('spin'));
@@ -609,6 +708,14 @@ async function spin() {
     });
 
     await Promise.all(reelPromises);
+
+    // Track symbol occurrences for missions
+    grid.forEach(reel => {
+        reel.forEach(symbol => {
+            checkMissionProgress('symbol', symbol);
+        });
+    });
+
     checkWin(grid);
     state.isSpinning = false;
     if (state.autoPlay) setTimeout(spin, 1500);
@@ -652,6 +759,8 @@ function checkWin(grid) {
     }
 
     if (totalWin > 0) {
+        state.winStreak++;
+        checkMissionProgress('streak', state.winStreak);
         const jackpotWin = winningLines.find(w => w.count === 5 && w.symbol === '💎');
         if (config.hasJackpot && jackpotWin) {
             totalWin += state.jackpot;
@@ -668,6 +777,8 @@ function checkWin(grid) {
 
         handleWinUI(totalWin);
     } else {
+        state.winStreak = 0;
+        checkMissionProgress('streak', 0);
         addLog(getRandomLog('loss'), "log-loss");
         elements.appContainer.classList.add('glitch-flash');
         showFloatingFeedback(`-${state.currentBet.toLocaleString()}`, 'loss');

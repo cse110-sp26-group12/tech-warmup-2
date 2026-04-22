@@ -282,3 +282,12 @@ For each of the different models they should have thier own personality for the 
 **Outcome:** Successfully implemented extended customization options, I'm slightly disappointed with the audio options since all it does is just change the pitch.
 
 **Hand-edits:** N/A
+
+---
+## Iteration 22 - [Missions Feature and Log Visual Appeal]
+
+**Prompt:** Make the missions visible to the user, and add rewards for completing the missions. They can be basic missions such as spin 10 times, or land on diamonds 15 times. Also make the neural logs section more visually appealing.
+
+**Outcome:** Successfully added a missions feature and color coded the log output to better identify outcomes.
+
+**Hand-edits:** N/A

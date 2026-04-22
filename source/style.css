@@ -352,7 +352,129 @@ body.mirrored .modal, body.flipped .modal {
 footer { grid-area: footer; text-align: center; padding-top: 5px; }
 .minimal-btn { background: transparent; color: #444; border: 1px solid #222; padding: 4px 15px; font-size: 0.7rem; box-shadow: none; }
 
+.missions-header-title {
+    margin-top: 15px !important;
+    border-bottom: 1px solid rgba(0, 229, 255, 0.2) !important;
+    color: var(--primary-color) !important;
+}
+
+/* Missions Styling */
+.missions-list {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.mission-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 8px;
+    transition: all 0.3s ease;
+}
+
+.mission-item.completed {
+    border-color: var(--primary-color);
+    background: rgba(0, 229, 255, 0.1);
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+}
+
+.mission-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    margin-bottom: 4px;
+}
+
+.mission-reward {
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+.mission-desc {
+    font-size: 0.8rem;
+    color: #bbb;
+    margin-bottom: 6px;
+}
+
+.mission-progress-bar {
+    height: 4px;
+    background: #222;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.mission-progress-fill {
+    height: 100%;
+    background: var(--secondary-color);
+    width: 0%;
+    transition: width 0.5s ease;
+}
+
+.mission-item.completed .mission-progress-fill {
+    background: var(--primary-color);
+}
+
+/* Neural Logs Enhancement */
+.log-entry {
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    border-left: 2px solid #333;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 0 6px 6px 0;
+    animation: slide-in-log 0.3s ease-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.log-entry::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.5s;
+}
+
+.log-entry:hover::before {
+    transform: translateX(100%);
+}
+
+@keyframes slide-in-log {
+    from { transform: translateX(10px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.log-entry.log-win {
+    border-left-color: var(--primary-color);
+    background: rgba(0, 229, 255, 0.05);
+    color: #fff;
+    text-shadow: 0 0 5px rgba(0, 229, 255, 0.5);
+}
+
+.log-entry.log-loss {
+    border-left-color: var(--accent-color);
+    background: rgba(255, 64, 129, 0.05);
+}
+
+.log-time {
+    color: #666;
+    margin-right: 6px;
+    font-size: 0.65rem;
+    font-weight: bold;
+    font-family: monospace;
+}
+
+.log-msg {
+    word-break: break-word;
+}
+
 @media (max-width: 1000px) {
     .app-container { grid-template-areas: "header" "main" "sidebar"; grid-template-columns: 1fr; overflow-y: auto; }
     body { overflow: auto; }
 }
+
