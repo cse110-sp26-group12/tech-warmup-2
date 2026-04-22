@@ -66,4 +66,6 @@ What each person contributed during the research phase. Research files are in `/
 
 - **Kyle Kim** wrote kyle.md, a longer file focused on AI workflow ideas: PRD-driven iteration, fresh-context subagents, a verification step before marking items complete, progress-doc structure, and a harness/model recommendation. Also flagged a few AI-specific risks (context starvation, agent commits, hand-edit logging, agents claiming items complete when they aren't verified).
 
-- **Joshua Robles** and **Raiden Louie** do not have research files in the raw-research folder at the time of writing this overview. 
+- **Joshua Robles** contributed his research through a Google Doc titled "Slot Machines o Algo," linked from the team's Miro board. His Doc covers mobile-first web design (mobile share of web traffic, search-ranking penalties for non-mobile sites), mobile UX best practices from Forbes, user engagement practices from a Jetpack guide, near-miss psychology (with an NIH research article showing near-misses are perceived as wins by gamblers), skill stops as a slot-machine feature (noting they do not affect outcomes on a virtual slot machine since results are pre-determined), and bonus-game design patterns such as bonus spins that unlock microgames or progress a storyline.
+
+- **Raiden Louie** does not have a research file in the raw-research folder or a note on the Miro board at the time of writing this overview. 
