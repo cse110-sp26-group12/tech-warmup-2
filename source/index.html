@@ -11,8 +11,8 @@
         <header>
             <h1>AI Token Casino</h1>
             <div class="jackpot-container">
-                <span>LIVE JACKPOT:</span>
-                <span id="jackpot-ticker">100,000</span> GPU Credits
+                <span id="jackpot-ticker">100,000</span>
+                <small>GPU CREDITS</small>
             </div>
         </header>
 
@@ -34,8 +34,11 @@
 
             <div class="controls">
                 <div class="tokens-display">
-                    Tokens: <span id="token-balance">1,000</span>
-                    <button id="add-tokens-btn" title="Add 1,000 Tokens">+</button>
+                    <div class="balance-info">
+                        <span class="balance-label">Compute Balance</span>
+                        <div id="token-balance">1,000</div>
+                    </div>
+                    <button id="add-tokens-btn" title="Refill Compute Credits">+</button>
                 </div>
                 <div class="bet-controls">
                     <button class="bet-btn" data-amount="1">1</button>
@@ -44,37 +47,37 @@
                     <button class="bet-btn" id="max-bet">MAX</button>
                 </div>
                 <div class="action-buttons">
-                    <button id="spin-btn">SPIN</button>
-                    <button id="auto-btn">AUTO-BET</button>
+                    <button id="spin-btn">Spin Model</button>
+                    <button id="auto-btn">Auto-Bet</button>
                 </div>
             </div>
         </main>
 
         <aside class="sidebar">
             <section class="logs-container">
-                <h3>AI Training Logs</h3>
+                <h3>Neural Logs</h3>
                 <div id="game-logs"></div>
             </section>
             <section class="stats-container">
-                <h3>Statistics</h3>
+                <h3>Performance Stats</h3>
                 <div id="game-stats">
-                    <p>Spins: <span id="stat-spins">0</span></p>
-                    <p>Total Won: <span id="stat-won">0</span></p>
+                    <p>Inferences: <span id="stat-spins">0</span></p>
+                    <p>Yield: <span id="stat-won">0</span></p>
                     <p>Missions: <span id="stat-missions">0/3</span></p>
                 </div>
             </section>
         </aside>
 
         <footer>
-            <button id="settings-btn">Settings</button>
+            <button id="settings-btn">Environment Settings</button>
         </footer>
     </div>
 
     <div id="settings-modal" class="modal hidden">
         <div class="modal-content">
-            <h2>Settings</h2>
+            <h2>Environment Configuration</h2>
             <div class="setting-group">
-                <label>Theme</label>
+                <label>Theme Overlay</label>
                 <select id="theme-select">
                     <option value="dark">Shadow Mode (Dark)</option>
                     <option value="light">Prompt Engineer (Light)</option>
@@ -82,10 +85,10 @@
                 </select>
             </div>
             <div class="setting-group">
-                <label>Sound</label>
+                <label>Audio Feedback</label>
                 <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.5">
             </div>
-            <button id="close-settings">Close</button>
+            <button id="close-settings">Apply & Close</button>
         </div>
     </div>
 

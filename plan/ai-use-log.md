@@ -100,3 +100,15 @@ Clear code matters more than clever code — the goal is a codebase that reads a
 ---
 
 
+## Iteration 5 — [Cleaning up UI]
+
+**Prompt:** Can you clean up the UI so that it resembles more of a actualy Casino while still sticking to the theme of being AI mockery themed etc. 
+
+**Outcome:** Completely changed the UI it looks a lot better now. Added backdrops and colors to the buttons. The buttons look like they have depth added to them
+
+**Worked / didn't work:** We have to scroll up and down which might be annoying from a UX perspective, also the setting doesnt open up as a modal. 
+
+**Hand-edits:** None
+
+---
+
