@@ -270,7 +270,9 @@ function drawPaylines() {
         });
 
         path.setAttribute('d', d);
-        path.setAttribute('class', `payline-path line-${idx}`);
+        // Set active class if it's within the active paylines count
+        const isActive = idx < state.activePaylines;
+        path.setAttribute('class', `payline-path line-${idx}${isActive ? ' active' : ''}`);
         path.id = `payline-${idx}`;
         svg.appendChild(path);
     });
@@ -280,16 +282,10 @@ function updatePaylineDisplay() {
     state.activePaylines = parseInt(elements.paylineRange.value);
     elements.paylineCount.textContent = state.activePaylines;
     
-    // Highlight active lines briefly
+    // Highlight active lines and KEEP them visible
     document.querySelectorAll('.payline-path').forEach((path, idx) => {
         path.classList.toggle('active', idx < state.activePaylines);
     });
-    
-    setTimeout(() => {
-        if (!state.isSpinning) {
-            document.querySelectorAll('.payline-path').forEach(path => path.classList.remove('active'));
-        }
-    }, 1000);
 }
 
 // Paytable Logic
@@ -428,6 +424,7 @@ async function spin() {
     // Clear previous wins
     document.querySelectorAll('.payline-path').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.symbol.win').forEach(s => s.classList.remove('win'));
+    elements.slotMachine.classList.remove('big-win-glow');
 
     const config = MODEL_CONFIGS[state.currentModel];
     
@@ -546,12 +543,6 @@ function checkWin(grid) {
     } else {
         state.lossStreak++;
     }
-
-    setTimeout(() => {
-        document.querySelectorAll('.payline-path').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.symbol.win').forEach(s => s.classList.remove('win'));
-        elements.slotMachine.classList.remove('big-win-glow');
-    }, 2500);
 
     updateUI();
 }

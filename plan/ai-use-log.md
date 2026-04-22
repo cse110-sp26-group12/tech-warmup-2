@@ -233,19 +233,19 @@ For each of the different models they should have thier own personality for the 
 
 **Outcome:** Successfully added more reels and paylines, along with a paytable. SPin button is now cut off though. I would like to further improve the UI.
 
+**Hand-edits:** N/A
+
+---
+## Iteration 17 - [Fixing and Improving UI]
+
+**Prompt:** After adding the additional reels and paylines, it seems the top part of the slot machine and the bottom part of the spin button are cut off and not displaying properly on the browser. Can you fix those? Can you also make it so when adjusting the paylines, the lines stay visible until I press spin. Instead of flashing briefly. 
+
+**Outcome:** Successfully fixed and implemented the changes prompted.
+
 **Hand-edits:** TBD
 
 ---
-## Iteration 17 - [---]
-
-**Prompt:** 
-
-**Outcome:** TBD
-
-**Hand-edits:** TBD
-
----
-## Iteration 18 - [---]
+## Iteration 18 - [Further UI Improvements]
 
 **Prompt:** 
 
