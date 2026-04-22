@@ -118,12 +118,23 @@ let state = {
     }
 };
 
+// Internal values for display animations
+let displayTokens = state.tokens;
+let reelStopHandlers = [];
+
 // DOM Elements
 const elements = {
+    appContainer: document.querySelector('.app-container'),
+    slotMachine: document.querySelector('.slot-machine'),
     reels: [
         document.querySelector('#reel-1 .reel-strip'),
         document.querySelector('#reel-2 .reel-strip'),
         document.querySelector('#reel-3 .reel-strip')
+    ],
+    reelContainers: [
+        document.getElementById('reel-1'),
+        document.getElementById('reel-2'),
+        document.getElementById('reel-3')
     ],
     tokenBalance: document.getElementById('token-balance'),
     jackpotTicker: document.getElementById('jackpot-ticker'),
@@ -197,14 +208,58 @@ function createSymbolElement(symbol) {
 }
 
 /**
- * Updates the UI based on current state.
+ * Updates the UI based on current state with count-up animation for tokens.
+ * @param {boolean} [instant=false] - Whether to skip count-up animation.
  */
-function updateUI() {
-    elements.tokenBalance.textContent = state.tokens.toLocaleString();
+function updateUI(instant = false) {
+    if (instant) {
+        displayTokens = state.tokens;
+        elements.tokenBalance.textContent = state.tokens.toLocaleString();
+    } else {
+        animateTokenCount();
+    }
+    
     elements.jackpotTicker.textContent = Math.floor(state.jackpot).toLocaleString();
     elements.statSpins.textContent = state.stats.spins;
     elements.statWon.textContent = state.stats.won.toLocaleString();
     elements.statMissions.textContent = `${state.stats.missions}/3`;
+}
+
+/**
+ * Animates the token count up/down.
+ */
+function animateTokenCount() {
+    const target = state.tokens;
+    if (displayTokens === target) return;
+
+    const duration = 1000;
+    const startTime = performance.now();
+    const startValue = displayTokens;
+    const diff = target - startValue;
+
+    elements.tokenBalance.classList.add('counting');
+
+    function step(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Easing function
+        const easedProgress = 1 - Math.pow(1 - progress, 3);
+        
+        displayTokens = Math.floor(startValue + (diff * easedProgress));
+        elements.tokenBalance.textContent = displayTokens.toLocaleString();
+
+        if (progress < 1) {
+            requestAnimationFrame(step);
+            if (Math.random() > 0.7) playSound(1000 + (progress * 500), 'sine', 0.02);
+        } else {
+            displayTokens = target;
+            elements.tokenBalance.textContent = displayTokens.toLocaleString();
+            elements.tokenBalance.classList.remove('counting');
+        }
+    }
+
+    requestAnimationFrame(step);
 }
 
 /**
@@ -277,6 +332,10 @@ function startSpinState() {
     updateUI();
     playSound(200, 'square', 0.05);
     addLog(getRandomLog('spin'));
+    
+    // Clear any previous stop handlers
+    reelStopHandlers.forEach(({el, handler}) => el.removeEventListener('click', handler));
+    reelStopHandlers = [];
 }
 
 /**
@@ -288,16 +347,31 @@ function startSpinState() {
  */
 function animateReel(reel, index, resultsArray) {
     return new Promise(resolve => {
-        const spinDuration = 1000 + (index * 500);
-        const symbolHeight = reel.querySelector('.symbol').clientHeight;
+        const spinDuration = 2000 + (index * 800);
+        const symbolHeight = 100; // Fixed symbol height for calculation
         const stopIdx = Math.floor(Math.random() * SYMBOLS.length);
         const resultSymbol = SYMBOLS[stopIdx];
         resultsArray.push(resultSymbol);
 
+        reel.classList.add('spinning');
+        
+        // Manual Stop Implementation
+        const container = elements.reelContainers[index];
+        const stopHandler = () => {
+            if (reel.classList.contains('spinning')) {
+                reel.style.transitionDuration = '200ms';
+                addLog(`Manual intervention on Reel ${index + 1}.`, 'log-entry');
+                playSound(600, 'sine', 0.05);
+            }
+        };
+        container.addEventListener('click', stopHandler);
+        reelStopHandlers.push({el: container, handler: stopHandler});
+
         /**
-         * Local handler for stopping or finishing the transition.
+         * Local handler for finishing the transition.
          */
         reel.ontransitionend = () => {
+            reel.classList.remove('spinning');
             reel.style.transition = 'none';
             reel.innerHTML = '';
             for (let j = 0; j < 20; j++) {
@@ -321,13 +395,17 @@ function animateReel(reel, index, resultsArray) {
  * @param {string[]} results - The resulting symbols from the spin.
  */
 function finalizeSpin(results) {
+    // Cleanup stop handlers
+    reelStopHandlers.forEach(({el, handler}) => el.removeEventListener('click', handler));
+    reelStopHandlers = [];
+
     checkWin(results);
     state.isSpinning = false;
 
     if (state.autoPlay) {
         setTimeout(() => {
             if (state.autoPlay) spin();
-        }, 1000);
+        }, 1200);
     }
 }
 
@@ -349,7 +427,7 @@ function checkWin(results) {
     updatePostWinState(winAmount);
     updateMissions(winAmount);
     
-    setTimeout(clearWinVisuals, 2000);
+    setTimeout(clearWinVisuals, 2500);
 
     updateUI();
     saveState();
@@ -377,6 +455,14 @@ function calculateWin(symbol) {
  * @param {number} winAmount - Amount won.
  */
 function handleWinUI(symbol, winAmount) {
+    elements.appContainer.classList.add('win-flash');
+    setTimeout(() => elements.appContainer.classList.remove('win-flash'), 1000);
+
+    elements.slotMachine.classList.add('shake');
+    if (symbol === '🛸' || symbol === '💎') {
+        elements.slotMachine.classList.add('big-win-glow');
+    }
+    
     document.querySelector('.payline').classList.add('active');
     elements.reels.forEach(reel => {
         const centerSymbol = reel.querySelectorAll('.symbol')[1];
@@ -390,12 +476,12 @@ function handleWinUI(symbol, winAmount) {
             addLog("FOUNDATION MODEL CONVERGED! JACKPOT!", "log-win");
         }
         state.jackpot = 100000;
-        document.querySelector('.slot-machine').classList.add('shake');
-        setTimeout(() => document.querySelector('.slot-machine').classList.remove('shake'), 1000);
+        playSound(1200, 'sine', 0.5);
     } else {
         addLog(`${getRandomLog('win')} Won ${winAmount} tokens.`, "log-win");
     }
-    playSound(800, 'triangle', 0.3);
+    playSound(800, 'triangle', 0.4);
+    playSound(1000, 'sine', 0.2);
 }
 
 /**
@@ -442,6 +528,7 @@ function updateMissions(winAmount) {
 function clearWinVisuals() {
     document.querySelector('.payline').classList.remove('active');
     document.querySelectorAll('.symbol.win').forEach(s => s.classList.remove('win'));
+    elements.slotMachine.classList.remove('shake', 'big-win-glow');
 }
 
 /**
@@ -499,18 +586,19 @@ elements.betBtns.forEach(btn => {
         elements.maxBetBtn.classList.remove('active');
         btn.classList.add('active');
         state.currentBet = parseInt(btn.dataset.amount) || 10;
+        playSound(800, 'sine', 0.05);
     });
 });
 
 elements.maxBetBtn.addEventListener('click', () => {
     elements.betBtns.forEach(b => b.classList.remove('active'));
     elements.maxBetBtn.classList.add('active');
-    // Ensure max bet is at least 1 if user has tokens, but capped at 1000
     state.currentBet = Math.min(state.tokens, 1000);
     if (state.tokens > 0 && state.currentBet === 0) {
         state.currentBet = Math.min(state.tokens, 1);
     }
     addLog(`Going all in: ${state.currentBet} bet set.`);
+    playSound(1000, 'sine', 0.1);
 });
 
 elements.settingsBtn.addEventListener('click', () => {
@@ -543,7 +631,7 @@ setInterval(() => {
 function init() {
     loadState();
     initReels();
-    updateUI();
+    updateUI(true);
     addLog("Welcome to the AI Token Casino. Connect your GPU to begin.");
 }
 

@@ -86,15 +86,16 @@ Clear code matters more than clever code — the goal is a codebase that reads a
 
 ---
 
-## Iteration 4 — [Short Title]
+## Iteration 4 — [Visual Feedback + Animations]
 
-**Prompt:** [exact prompt sent]
+**Prompt:** Add spin animation with easing, a win-flash animation, a count-up animation on token gains,  and a brief screen shake or glow on big wins. As a thrill-seeker, I want interactive features beyond just pulling the lever so I can be entertained even without winning money and also asa casual player, I want clear visual and sound feedback so that I feel excited and rewarded.
 
-**Outcome:** [what the AI produced / what changed]
 
-**Worked / didn't work:** [brief notes]
+**Outcome:** There are more sound effects and visual blurs and glows. Plus the tooken decrease and increase incrementally and slowly etc. 
 
-**Hand-edits:** [none / what + why]
+**Worked / didn't work:** Everything is working as expected
+
+**Hand-edits:** None
 
 ---
 
