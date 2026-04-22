@@ -242,16 +242,16 @@ For each of the different models they should have thier own personality for the 
 
 **Outcome:** Successfully fixed and implemented the changes prompted.
 
-**Hand-edits:** TBD
+**Hand-edits:** N/A
 
 ---
 ## Iteration 18 - [Further UI Improvements]
 
-**Prompt:** 
+**Prompt:** After pressing the spin button, as the slot machine's reels slow down and are about to show the result, the reels suddenly change. Showing a different result than what might've been expected. Can you fix this?
 
-**Outcome:** TBD
+**Outcome:** Successfully fixed the bug mentioned in the prompt.
 
-**Hand-edits:** TBD
+**Hand-edits:** N/A
 
 ---
 ## Iteration 19 - [---]

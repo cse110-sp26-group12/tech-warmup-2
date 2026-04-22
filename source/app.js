@@ -444,11 +444,47 @@ async function spin() {
             if (state.currentModel === 'chatgpt') spinDuration = 600 + (i * 150);
             
             const symbolHeight = 80;
+            const resultPosition = 27; // Shift by 27 symbols to show the result
+            
+            // 1. Capture current symbols to maintain continuity
+            const currentSymbols = Array.from(reel.querySelectorAll('.symbol')).map(s => s.textContent).slice(0, 3);
+            
+            // 2. Rebuild the strip for the animation
+            reel.innerHTML = '';
+            // Current visible symbols at the top
+            for (let j = 0; j < 3; j++) {
+                const sym = document.createElement('div');
+                sym.className = 'symbol';
+                sym.textContent = currentSymbols[j] || config.symbols[0];
+                reel.appendChild(sym);
+            }
+            // Filler symbols in the middle
+            for (let j = 3; j < resultPosition; j++) {
+                const sym = document.createElement('div');
+                sym.className = 'symbol';
+                sym.textContent = config.symbols[Math.floor(Math.random() * config.symbols.length)];
+                reel.appendChild(sym);
+            }
+            // The ACTUAL result symbols at the landing position
+            for (let j = 0; j < 3; j++) {
+                const sym = document.createElement('div');
+                sym.className = 'symbol';
+                sym.textContent = grid[i][j];
+                reel.appendChild(sym);
+            }
+
+            // Reset position without animation
+            reel.style.transition = 'none';
+            reel.style.transform = 'translateY(0px)';
+            reel.offsetHeight; // Force reflow
+
             reel.classList.add('spinning');
             
             reel.ontransitionend = () => {
                 reel.classList.remove('spinning');
                 reel.style.transition = 'none';
+                
+                // Final cleanup: set the result as the new top symbols
                 reel.innerHTML = '';
                 for (let j = 0; j < 30; j++) {
                     const sym = document.createElement('div');
@@ -465,8 +501,9 @@ async function spin() {
                 resolve();
             };
 
+            // Start the spin animation
             reel.style.transition = `transform ${spinDuration}ms cubic-bezier(0.45, 0.05, 0.55, 0.95)`;
-            const totalShift = (27 * symbolHeight);
+            const totalShift = resultPosition * symbolHeight;
             reel.style.transform = `translateY(-${totalShift}px)`;
         });
     });
