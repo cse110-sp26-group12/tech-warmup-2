@@ -156,13 +156,13 @@ For each of the different models they should have thier own personality for the 
 
 ---
 
-## Iteration 9 — [Cleaning up UI Part 4]
+## Iteration 9 — [Cleaning up UI and animations Part 4]
 
-**Prompt:** Make it so that the three buttons for the 3 different games say the following only: ChatGPT, Gemini, Claude, I also noticed that as the chat logs grows it pushes everything down please fix this. I also want more information of all the payout structures for each of the models so that the user has information on the payouts and so they would be more informed when playing of what to expect. also Claude should have a jackpot chance where you can win a very big amount. The other two model they would not have a jackpot
+**Prompt:** I need to make this casino slot app more appealing with better UI that resembling more of a casino while still sticking to the theme of AI, Make it so that all of the buttons are styled properly and add more animations and effects when you win or lose something. Maybe add different effects depending on the multiplier model, etc. Make the UI easy to use and good from a UX standpoint Make sure everything fits in one page so that we dont have to scroll up or down etc. 
 
-**Outcome:** Fixed the neural logs overflow, Added a button for paytable showing the different payouts structures for each model. 
+**Outcome:** Made the UI Better buttons are better
 
-**Worked / didn't work:** Works find
+**Worked / didn't work:** There a few bugs which are introduced again such as the chat logs pushing down the whole UI etc. 
 
 **Hand-edits:** None
 

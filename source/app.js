@@ -20,7 +20,7 @@ const MODEL_CONFIGS = {
         symbols: ['🍕', '🍦', '🍔', '🌮', '🍩', '🎈', '🎉', '🎁', '🐶'],
         payouts: { '🍕': 50, '🍦': 20, '🍔': 10, '🌮': 5, '🍩': 5, '🎈': 2, '🎉': 2, '🎁': 1, '🐶': 1 },
         bets: [1, 2, 5, 10],
-        winFrequency: 0.4,
+        winFrequency: 0.45, // High frequency for Gary
         hasJackpot: false,
         logs: {
             spin: ["Ordering a pizza while I spin...", "Gary's here for a good time!", "Trying to make $20 last all night.", "Ooh, look at the pretty lights!"],
@@ -48,7 +48,7 @@ const MODEL_CONFIGS = {
         symbols: ['💰', '🎰', '🏦', '💎', '💳', '📊', '📈', '🏢', '⚖️'],
         payouts: { '💰': 1000, '🎰': 500, '🏦': 200, '💎': 100, '💳': 50, '📊': 0, '📈': 0, '🏢': 0, '⚖️': 0 },
         bets: [100, 200, 500, 1000],
-        winFrequency: 0.15,
+        winFrequency: 0.12, // High volatility for Karen
         hasJackpot: true,
         logs: {
             spin: ["I need to see the manager of this RNG.", "This machine better be 'loose'.", "All in. I don't have time for small talk.", "Where's my high-roller suite?"],
@@ -73,7 +73,6 @@ let state = {
 };
 
 let displayTokens = state.tokens;
-let reelStopHandlers = [];
 
 // DOM Elements
 const elements = {
@@ -137,8 +136,6 @@ function setModel(modelId) {
     
     document.body.setAttribute('data-model', modelId);
     elements.modelBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.model === modelId));
-    
-    // Toggle Jackpot visibility
     elements.jackpotDisplay.classList.toggle('hidden', !config.hasJackpot);
     
     // Update Bet Buttons
@@ -164,8 +161,8 @@ function setModel(modelId) {
     maxBtn.onclick = () => {
         document.querySelectorAll('.bet-btn').forEach(b => b.classList.remove('active'));
         maxBtn.classList.add('active');
-        state.currentBet = Math.min(state.tokens, config.bets[config.bets.length-1] * 2);
-        addLog(`Going all in: ${state.currentBet} bet set.`);
+        state.currentBet = config.bets[config.bets.length - 1];
+        addLog(`High-confidence bet: ${state.currentBet} tokens.`);
         playSound(1000, 'sine', 0.1);
     };
     elements.betContainer.appendChild(maxBtn);
@@ -176,7 +173,7 @@ function setModel(modelId) {
         if (firstBtn) firstBtn.classList.add('active');
     }
 
-    addLog(`System reconfigured: Loaded ${config.name} model architecture.`);
+    addLog(`Neural weights re-initialized for ${config.name}.`);
     initReels();
     updateUI(true);
 }
@@ -184,31 +181,26 @@ function setModel(modelId) {
 // Paytable Logic
 function openPaytable() {
     const config = MODEL_CONFIGS[state.currentModel];
-    elements.paytableTitle.textContent = `${config.name} Payouts`;
+    elements.paytableTitle.textContent = `${config.name} Architecture`;
     elements.paytableGrid.innerHTML = '';
     
-    config.symbols.forEach(sym => {
-        const payout = config.payouts[sym];
+    Object.entries(config.payouts).forEach(([sym, mult]) => {
         const item = document.createElement('div');
         item.className = 'paytable-item';
         item.innerHTML = `
             <span class="paytable-sym">${sym}</span>
-            <span class="paytable-val">${payout > 0 ? 'x' + payout : 'Hallucination (0)'}</span>
+            <span class="paytable-val">${mult > 0 ? 'x' + mult : 'Hallucination'}</span>
         `;
         elements.paytableGrid.appendChild(item);
     });
 
     if (config.hasJackpot) {
-        const jackpotItem = document.createElement('div');
-        jackpotItem.className = 'paytable-item';
-        jackpotItem.style.borderTop = '2px solid var(--accent-color)';
-        jackpotItem.innerHTML = `
-            <span class="paytable-sym">💰💰💰</span>
-            <span class="paytable-val">LIVE JACKPOT</span>
-        `;
-        elements.paytableGrid.appendChild(jackpotItem);
+        const jack = document.createElement('div');
+        jack.className = 'paytable-item';
+        jack.style.borderTop = '2px solid var(--accent-color)';
+        jack.innerHTML = `<span class="paytable-sym">💰💰💰</span><span class="paytable-val">JACKPOT</span>`;
+        elements.paytableGrid.appendChild(jack);
     }
-
     elements.paytableModal.classList.remove('hidden');
 }
 
@@ -229,7 +221,7 @@ function updateUI(instant = false) {
 function animateTokenCount() {
     const target = state.tokens;
     if (displayTokens === target) return;
-    const duration = 1000;
+    const duration = 1200;
     const startTime = performance.now();
     const startValue = displayTokens;
     const diff = target - startValue;
@@ -238,7 +230,7 @@ function animateTokenCount() {
     function step(currentTime) {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        const easedProgress = 1 - Math.pow(1 - progress, 3);
+        const easedProgress = 1 - Math.pow(1 - progress, 4); // Quartic ease out
         displayTokens = Math.floor(startValue + (diff * easedProgress));
         elements.tokenBalance.textContent = displayTokens.toLocaleString();
         if (progress < 1) {
@@ -253,7 +245,7 @@ function animateTokenCount() {
     requestAnimationFrame(step);
 }
 
-// Core Logic
+// Core Gameplay
 function initReels() {
     const symbols = MODEL_CONFIGS[state.currentModel].symbols;
     elements.reels.forEach(reel => {
@@ -283,7 +275,7 @@ function getRandomLog(category) {
 async function spin() {
     if (state.isSpinning) return;
     if (state.tokens < state.currentBet || state.currentBet <= 0) {
-        addLog("Insufficient compute credits.", "log-loss");
+        addLog("Compute credits depleted. Refill required.", "log-loss");
         state.autoPlay = false;
         elements.autoBtn.classList.remove('active');
         return;
@@ -298,11 +290,11 @@ async function spin() {
     addLog(getRandomLog('spin'));
 
     const config = MODEL_CONFIGS[state.currentModel];
+    const isWin = Math.random() < config.winFrequency;
     const results = [];
     
-    const isWin = Math.random() < config.winFrequency;
     if (isWin) {
-        const winSym = config.symbols[Math.floor(Math.random() * 4)];
+        const winSym = config.symbols[Math.floor(Math.random() * 5)];
         results.push(winSym, winSym, winSym);
     } else {
         while (results.length < 3) {
@@ -316,12 +308,15 @@ async function spin() {
 
     const reelPromises = elements.reels.map((reel, i) => {
         return new Promise(resolve => {
-            const spinDuration = 2000 + (i * 800);
-            const symbolHeight = 80;
+            const spinDuration = 2000 + (i * 600);
+            const symbolHeight = 90;
             reel.classList.add('spinning');
             
             const stopHandler = () => {
-                if (reel.classList.contains('spinning')) reel.style.transitionDuration = '200ms';
+                if (reel.classList.contains('spinning')) {
+                    reel.style.transitionDuration = '200ms';
+                    playSound(600, 'sine', 0.05);
+                }
             };
             elements.reelContainers[i].addEventListener('click', stopHandler);
 
@@ -351,7 +346,7 @@ async function spin() {
     await Promise.all(reelPromises);
     checkWin(results);
     state.isSpinning = false;
-    if (state.autoPlay) setTimeout(spin, 1200);
+    if (state.autoPlay) setTimeout(spin, 1500);
 }
 
 function checkWin(results) {
@@ -363,16 +358,16 @@ function checkWin(results) {
         const basePayout = config.payouts[r1] || 0;
         winAmount = basePayout * state.currentBet;
         
-        // Jackpot logic restricted to Claude (Karen)
         if (config.hasJackpot && (r1 === '💰' || r1 === '🎰')) {
             winAmount += state.jackpot;
             state.jackpot = 100000;
             elements.slotMachine.classList.add('big-win-glow');
         }
-
         handleWinUI(r1, winAmount);
     } else {
         addLog(getRandomLog('loss'), "log-loss");
+        elements.appContainer.classList.add('glitch-flash');
+        setTimeout(() => elements.appContainer.classList.remove('glitch-flash'), 400);
     }
 
     if (winAmount > 0) {
@@ -386,7 +381,7 @@ function checkWin(results) {
     setTimeout(() => {
         document.querySelector('.payline').classList.remove('active');
         document.querySelectorAll('.symbol.win').forEach(s => s.classList.remove('win'));
-        elements.slotMachine.classList.remove('shake', 'big-win-glow');
+        elements.slotMachine.classList.remove('big-win-glow');
     }, 2500);
 
     updateUI();
@@ -395,7 +390,6 @@ function checkWin(results) {
 function handleWinUI(symbol, winAmount) {
     elements.appContainer.classList.add('win-flash');
     setTimeout(() => elements.appContainer.classList.remove('win-flash'), 1000);
-    elements.slotMachine.classList.add('shake');
     document.querySelector('.payline').classList.add('active');
     
     elements.reels.forEach(reel => {
@@ -403,11 +397,11 @@ function handleWinUI(symbol, winAmount) {
         if (centerSymbol) centerSymbol.classList.add('win');
     });
 
-    addLog(`${getRandomLog('win')} Won ${winAmount} tokens.`, "log-win");
+    addLog(`${getRandomLog('win')} Received ${winAmount} tokens.`, "log-win");
     playSound(800, 'triangle', 0.4);
 }
 
-// Events
+// Event Listeners
 elements.spinBtn.addEventListener('click', spin);
 elements.autoBtn.addEventListener('click', () => {
     state.autoPlay = !state.autoPlay;
@@ -418,7 +412,7 @@ elements.autoBtn.addEventListener('click', () => {
 elements.addTokensBtn.addEventListener('click', () => {
     state.tokens += 1000;
     updateUI();
-    addLog("Compute grant received: +1,000 tokens.", "log-win");
+    addLog("Compute grant authorized: +1,000 credits.", "log-win");
     playSound(600, 'sine', 0.2);
 });
 
@@ -433,6 +427,6 @@ setInterval(() => {
     if (!state.isSpinning && Math.random() > 0.8) addLog(getRandomLog('idle'));
 }, 10000);
 
-// Init
+// Initialize
 setModel('gemini');
-addLog("Welcome to the AI Token Casino. Connect your GPU to begin.");
+addLog("Neural connection established. Initializing slot cabinet...");
