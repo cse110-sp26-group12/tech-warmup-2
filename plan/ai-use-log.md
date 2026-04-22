@@ -213,14 +213,14 @@ For each of the different models they should have thier own personality for the 
 
 **Prompt:** For only the Chat-GPT difficulty, we want the slot spins to end faster. So for ONLY the Chat-GPT difficulty, keep the spinning animation but end the actually spinning quicker. Do not touch the Gemini and Claude slots.
 
-**Outcome:** TBD
+**Outcome:** At first, AI had some syntax errors but after fixing it successfully, ONLY Chat-GPT's slot spins quicker, while Gemini and Claude take a longer time to fully spin once.
 
-**Hand-edits:** TBD
+**Hand-edits:** Had to remove let and const from an already defined variable, 'spinDuration'
 
 ---
-## Iteration 15 - [---]
+## Iteration 15 - [Jackpot]
 
-**Prompt:** 
+**Prompt:** This change will ONLY be for the Claude difficulty. First, center the jackpot and make sure it doesn't cut off the top of the slot machine. Second, set up the system of winning the jackbox, where the player needs to get three diamond emoji's in a row to win it. Third, inform the user if they win the jackbox. Fourth, somewhere on the slot machine, tell the user how to win the jackpot.
 
 **Outcome:** TBD
 
