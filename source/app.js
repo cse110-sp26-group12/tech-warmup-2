@@ -98,6 +98,7 @@ const elements = {
     addTokensBtn: document.getElementById('add-tokens-btn'),
     logs: document.getElementById('game-logs'),
     statSpins: document.getElementById('stat-spins'),
+    jackpotHint: document.getElementById('jackpot-hint'),
     statWon: document.getElementById('stat-won'),
     statMissions: document.getElementById('stat-missions'),
     volumeSlider: document.getElementById('volume-slider'),
@@ -140,6 +141,7 @@ function setModel(modelId) {
     
     // Toggle Jackpot visibility and set base value
     elements.jackpotDisplay.classList.toggle('hidden', !config.hasJackpot);
+    elements.jackpotHint.classList.toggle('hidden', !config.hasJackpot);
     if (config.hasJackpot) {
         state.jackpot = 1000000; // 1M for Claude
     } else {
@@ -379,11 +381,11 @@ function checkWin(results) {
         const basePayout = config.payouts[r1] || 0;
         winAmount = basePayout * state.currentBet;
         
-        if (config.hasJackpot && (r1 === '💰' || r1 === '🎰')) {
+        if (config.hasJackpot && r1 === '💎') {
             winAmount += state.jackpot;
             state.jackpot = 1000000;
             elements.slotMachine.classList.add('big-win-glow');
-            showFloatingFeedback(`JACKPOT!!! +${winAmount.toLocaleString()}`, 'win');
+            showFloatingFeedback(`ULTIMATE JACKPOT!!! +${winAmount.toLocaleString()}`, 'win');
         } else {
             showFloatingFeedback(`+${winAmount.toLocaleString()} (x${basePayout})`, 'win');
         }
