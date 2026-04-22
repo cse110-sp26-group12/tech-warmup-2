@@ -169,19 +169,20 @@ function setModel(modelId) {
     maxBtn.onclick = () => {
         document.querySelectorAll('.bet-btn').forEach(b => b.classList.remove('active'));
         maxBtn.classList.add('active');
-        state.currentBet = config.bets[config.bets.length - 1];
-        addLog(`Priority execution: ${state.currentBet} bet set.`);
+        // ALL IN: Bet entire account balance
+        state.currentBet = state.tokens > 0 ? state.tokens : config.bets[0];
+        addLog(`ALL IN: ${state.currentBet.toLocaleString()} tokens staked!`);
         playSound(1000, 'sine', 0.1);
     };
     elements.betContainer.appendChild(maxBtn);
 
-    if (!config.bets.includes(state.currentBet)) {
+    if (!config.bets.includes(state.currentBet) && state.currentBet !== state.tokens) {
         state.currentBet = config.bets[0];
         const firstBtn = elements.betContainer.querySelector('.bet-btn');
         if (firstBtn) firstBtn.classList.add('active');
     }
 
-    addLog(`Model architecture swapped to ${config.name}.`);
+    addLog(`System reconfigured: Loaded ${config.name} model architecture.`);
     initReels();
     updateUI(true);
 }
@@ -189,7 +190,7 @@ function setModel(modelId) {
 // Paytable Logic
 function openPaytable() {
     const config = MODEL_CONFIGS[state.currentModel];
-    elements.paytableTitle.textContent = `${config.name} Architecture`;
+    elements.paytableTitle.textContent = `${config.name} Payouts`;
     elements.paytableGrid.innerHTML = '';
     
     Object.entries(config.payouts).forEach(([sym, mult]) => {
@@ -251,11 +252,6 @@ function animateTokenCount() {
     requestAnimationFrame(step);
 }
 
-/**
- * Shows floating feedback text over the reels.
- * @param {string} text 
- * @param {string} type - 'win' or 'loss'
- */
 function showFloatingFeedback(text, type) {
     const div = document.createElement('div');
     div.className = `floating-result ${type === 'win' ? 'log-win' : 'log-loss'}`;
@@ -330,7 +326,7 @@ async function spin() {
     const reelPromises = elements.reels.map((reel, i) => {
         return new Promise(resolve => {
             const spinDuration = 2000 + (i * 600);
-            const symbolHeight = 90;
+            const symbolHeight = 80;
             reel.classList.add('spinning');
             
             const stopHandler = () => {
@@ -391,7 +387,7 @@ function checkWin(results) {
     } else {
         addLog(getRandomLog('loss'), "log-loss");
         elements.appContainer.classList.add('glitch-flash');
-        showFloatingFeedback(`-${state.currentBet}`, 'loss');
+        showFloatingFeedback(`-${state.currentBet.toLocaleString()}`, 'loss');
         setTimeout(() => elements.appContainer.classList.remove('glitch-flash'), 400);
     }
 
@@ -422,7 +418,7 @@ function handleWinUI(symbol, winAmount) {
         if (centerSymbol) centerSymbol.classList.add('win');
     });
 
-    addLog(`${getRandomLog('win')} Received ${winAmount} tokens.`, "log-win");
+    addLog(`${getRandomLog('win')} Received ${winAmount.toLocaleString()} tokens.`, "log-win");
     playSound(800, 'triangle', 0.4);
 }
 
