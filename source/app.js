@@ -100,7 +100,14 @@ let state = {
     lossStreak: 0,
     currentModel: 'gemini',
     stats: { spins: 0, won: 0, missions: 0 },
-    settings: { volume: 0.5 }
+    settings: { 
+        volume: 0.5,
+        language: 'en',
+        soundTheme: 'ai',
+        machineColor: '#2a2a2a',
+        mirrored: false,
+        flipped: false
+    }
 };
 
 const PAYLINE_PATTERNS = [
@@ -150,6 +157,11 @@ const elements = {
     statWon: document.getElementById('stat-won'),
     statMissions: document.getElementById('stat-missions'),
     volumeSlider: document.getElementById('volume-slider'),
+    languageSelect: document.getElementById('language-select'),
+    soundThemeSelect: document.getElementById('sound-theme-select'),
+    machineColorPicker: document.getElementById('machine-color-picker'),
+    mirrorToggle: document.getElementById('mirror-toggle'),
+    flipToggle: document.getElementById('flip-toggle'),
     settingsModal: document.getElementById('settings-modal'),
     settingsBtn: document.getElementById('settings-btn'),
     closeSettings: document.getElementById('close-settings'),
@@ -165,17 +177,31 @@ const elements = {
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 function playSound(freq, type = 'sine', duration = 0.1) {
     if (state.settings.volume === 0) return;
+    
+    let actualFreq = freq;
+    let actualType = type;
+    let actualDuration = duration;
+
+    if (state.settings.soundTheme === 'classic') {
+        actualType = 'square';
+        actualFreq = freq * 0.8;
+        actualDuration = duration * 1.5;
+    } else if (state.settings.soundTheme === 'modern') {
+        actualType = 'sawtooth';
+        actualFreq = freq * 1.2;
+    }
+
     try {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        osc.type = actualType;
+        osc.frequency.setValueAtTime(actualFreq, audioCtx.currentTime);
         gain.gain.setValueAtTime(state.settings.volume, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + actualDuration);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.start();
-        osc.stop(audioCtx.currentTime + duration);
+        osc.stop(audioCtx.currentTime + actualDuration);
     } catch (e) {}
 }
 
@@ -356,6 +382,42 @@ function openPaytable() {
     elements.paytableModal.classList.remove('hidden');
 }
 
+const TRANSLATIONS = {
+    en: { title: "AI Token Casino", balance: "Compute Balance", stats: "Performance Stats", logs: "Neural Logs", settings: "Environment Configuration", language: "Language", audio: "Audio Feedback", soundTheme: "Sound Theme", machineColor: "Cabinet Color", mirror: "Mirror Interface", flip: "Flip Interface", close: "Apply & Close", spin: "Spin Model", auto: "Auto-Bet", architecture: "Model Architecture" },
+    es: { title: "Casino de Tokens de IA", balance: "Saldo de Cómputo", stats: "Estadísticas de Rendimiento", logs: "Registros Neuronales", settings: "Configuración del Entorno", language: "Idioma", audio: "Audio", soundTheme: "Tema de Sonido", machineColor: "Color del Gabinete", mirror: "Espejar Interfaz", flip: "Voltear Interfaz", close: "Aplicar y Cerrar", spin: "Girar Modelo", auto: "Auto-Apuesta", architecture: "Arquitectura" },
+    pt: { title: "Casino de Tokens de IA", balance: "Saldo de Computação", stats: "Estatísticas de Desempenho", logs: "Logs Neurais", settings: "Configuração de Ambiente", language: "Idioma", audio: "Áudio", soundTheme: "Tema de Som", machineColor: "Cor do Gabinete", mirror: "Espelhar Interface", flip: "Inverter Interface", close: "Aplicar e Fechar", spin: "Girar Modelo", auto: "Auto-Aposta", architecture: "Arquitetura" },
+    zh: { title: "AI 代币赌场", balance: "计算余额", stats: "性能统计", logs: "神经日志", settings: "环境配置", language: "语言", audio: "音频反馈", soundTheme: "声音主题", machineColor: "机柜颜色", mirror: "镜像界面", flip: "翻转界面", close: "应用并关闭", spin: "旋转模型", auto: "自动投注", architecture: "模型架构" },
+    it: { title: "Casinò di Token IA", balance: "Bilancio di Calcolo", stats: "Statistiche Prestazioni", logs: "Log Neurali", settings: "Configurazione Ambiente", language: "Lingua", audio: "Audio", soundTheme: "Tema Sonoro", machineColor: "Colore Cabinet", mirror: "Specchia Interfaccia", flip: "Capovolgi Interfaccia", close: "Applica e Chiudi", spin: "Gira Modello", auto: "Auto-Scommessa", architecture: "Architettura" },
+    fr: { title: "Casino de Jetons IA", balance: "Solde de Calcul", stats: "Stats de Performance", logs: "Logs Neuraux", settings: "Configuration de l'Environnement", language: "Langue", audio: "Audio", soundTheme: "Thème Sonore", machineColor: "Couleur du Cabinet", mirror: "Miroir Interface", flip: "Retourner Interface", close: "Appliquer et Fermer", spin: "Lancer Modèle", auto: "Auto-Pari", architecture: "Architecture" },
+    ja: { title: "AIトークンカジノ", balance: "計算残高", stats: "パフォーマンス統計", logs: "ニューラルログ", settings: "環境設定", language: "言語", audio: "オーディオ", soundTheme: "サウンドテーマ", machineColor: "キャビネットの色", mirror: "インターフェースをミラーリング", flip: "インターフェースを反転", close: "適用して閉じる", spin: "モデルをスピン", auto: "自動ベット", architecture: "アーキテクチャ" },
+    ko: { title: "AI 토큰 카지노", balance: "컴퓨팅 잔액", stats: "성능 통계", logs: "신경 로그", settings: "환경 설정", language: "언어", audio: "오디오 피드백", soundTheme: "사운드 테마", machineColor: "캐비닛 색상", mirror: "인터페이스 미러링", flip: "인터페이스 뒤집기", close: "적용 및 닫기", spin: "모델 스핀", auto: "자동 베팅", architecture: "아키텍처" },
+    ar: { title: "كازينو رموز الذكاء الاصطناعي", balance: "رصيد الحساب", stats: "إحصائيات الأداء", logs: "السجلات العصبية", settings: "إعدادات البيئة", language: "اللغة", audio: "الصوت", soundTheme: "سمة الصوت", machineColor: "لون الكابينة", mirror: "مرآة الواجهة", flip: "قلب الواجهة", close: "تطبيق وإغلاق", spin: "تدوير النموذج", auto: "رهان تلقائي", architecture: "هندسة النموذج" },
+    hi: { title: "AI टोकन कैसीनो", balance: "कंप्यूट बैलेंस", stats: "प्रदर्शन आँकड़े", logs: "तंत्रिका लॉग", settings: "पर्यावरण विन्यास", language: "भाषा", audio: "ऑडियो फीडबैक", soundTheme: "ध्वनि थीम", machineColor: "कैबिनेट का रंग", mirror: "इंटरफ़ेस मिरर करें", flip: "इंटरफ़ेस पलटें", close: "लागू करें और बंद करें", spin: "मॉडल स्पिन", auto: "ऑटो-बेट", architecture: "मॉडल आर्किटेक्चर" }
+};
+
+function updateLanguage() {
+    const t = TRANSLATIONS[state.settings.language] || TRANSLATIONS.en;
+    document.querySelector('.header-right h1').textContent = t.title;
+    document.querySelector('.balance-label').textContent = t.balance;
+    document.querySelector('.stats-container h3').textContent = t.stats;
+    document.querySelector('.logs-container h3').textContent = t.logs;
+    document.getElementById('settings-title').textContent = t.settings;
+    document.getElementById('label-language').textContent = t.language;
+    document.getElementById('label-audio').textContent = t.audio;
+    document.getElementById('label-sound-theme').textContent = t.soundTheme;
+    document.getElementById('label-machine-color').textContent = t.machineColor;
+    document.getElementById('label-mirror').textContent = t.mirror;
+    document.getElementById('label-flip').textContent = t.flip;
+    document.getElementById('close-settings').textContent = t.close;
+    document.getElementById('spin-btn').textContent = t.spin;
+    document.getElementById('auto-btn').textContent = t.auto;
+    document.getElementById('paytable-btn').textContent = t.architecture;
+}
+
+function updateMachineColor() {
+    elements.slotMachine.style.borderColor = state.settings.machineColor;
+}
+
 // UI Updates
 function updateUI(instant = false) {
     if (instant) {
@@ -368,6 +430,13 @@ function updateUI(instant = false) {
     elements.statSpins.textContent = state.stats.spins;
     elements.statWon.textContent = state.stats.won.toLocaleString();
     elements.statMissions.textContent = `${state.stats.missions}/3`;
+    
+    updateLanguage();
+    updateMachineColor();
+    
+    document.body.classList.toggle('mirrored', state.settings.mirrored);
+    document.body.classList.toggle('flipped', state.settings.flipped);
+    
     drawPaylines();
 }
 
@@ -645,6 +714,23 @@ elements.closeSettings.addEventListener('click', () => elements.settingsModal.cl
 elements.paytableBtn.addEventListener('click', openPaytable);
 elements.closePaytable.addEventListener('click', () => elements.paytableModal.classList.add('hidden'));
 elements.volumeSlider.addEventListener('input', (e) => state.settings.volume = parseFloat(e.target.value));
+elements.languageSelect.addEventListener('change', (e) => {
+    state.settings.language = e.target.value;
+    updateUI();
+});
+elements.soundThemeSelect.addEventListener('change', (e) => state.settings.soundTheme = e.target.value);
+elements.machineColorPicker.addEventListener('input', (e) => {
+    state.settings.machineColor = e.target.value;
+    updateMachineColor();
+});
+elements.mirrorToggle.addEventListener('change', (e) => {
+    state.settings.mirrored = e.target.checked;
+    updateUI();
+});
+elements.flipToggle.addEventListener('change', (e) => {
+    state.settings.flipped = e.target.checked;
+    updateUI();
+});
 
 setInterval(() => {
     if (!state.isSpinning && Math.random() > 0.8) addLog(getRandomLog('idle'));

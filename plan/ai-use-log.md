@@ -273,3 +273,12 @@ For each of the different models they should have thier own personality for the 
 **Outcome:** Honestly, pleasantly surprised that it worked. I thought my prompt wasn't specific enough and that it wouldn't work as I intended.
 
 **Hand-edits:** N/A
+
+---
+## Iteration 21 - [Customization and UI Options]
+
+**Prompt:** Add more customization and UI options in the environment settings area. Add language support for spanish, portugese, mandarin, italian, french, japanese, korean, arabic, and hindi. Allow users to change the color of slot machines. Allow users to change the kind of sounds they might hear while playing the game (for example there could be a classic slot machine sound and a modern slot machine sound, make sure to include a default AI sound theme). Add some fun settings like flipping/mirroring the entire interface. 
+
+**Outcome:** Successfully implemented extended customization options, I'm slightly disappointed with the audio options since all it does is just change the pitch.
+
+**Hand-edits:** N/A

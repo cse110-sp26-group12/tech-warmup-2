@@ -272,6 +272,81 @@ h3 { font-size: 0.7rem; color: var(--secondary-color); margin-bottom: 8px; borde
     font-style: italic;
 }
 
+/* Settings Modal Styles */
+.setting-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.setting-group label {
+    font-size: 0.8rem;
+    color: var(--primary-color);
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.setting-group select, .setting-group input[type="color"] {
+    background: #000;
+    color: #fff;
+    border: 1px solid #333;
+    padding: 8px;
+    border-radius: 5px;
+    font-family: var(--font-family);
+}
+
+.toggle-group {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toggle-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--primary-color);
+}
+
+/* Fun Transformations */
+.mirror-mode {
+    transform: scaleX(-1);
+}
+
+.mirror-mode .modal-content, .mirror-mode .game-logs, .mirror-mode .floating-result {
+    transform: scaleX(-1); /* Keep text readable in some places if desired, but request asked for entire interface */
+}
+
+/* If we want to mirror EVERYTHING including text: */
+.mirror-mode-full {
+    transform: scaleX(-1);
+}
+
+.flip-mode {
+    transform: scaleY(-1);
+}
+
+.flip-mode-full {
+    transform: rotate(180deg);
+}
+
+body.mirrored {
+    transform: scaleX(-1);
+}
+
+body.flipped {
+    transform: scaleY(-1);
+}
+
+body.mirrored.flipped {
+    transform: scaleX(-1) scaleY(-1);
+}
+
+/* Ensure fixed elements stay centered/correctly positioned if body is transformed */
+body.mirrored .modal, body.flipped .modal {
+    transform: none;
+}
+
 .hidden { display: none; }
 
 footer { grid-area: footer; text-align: center; padding-top: 5px; }

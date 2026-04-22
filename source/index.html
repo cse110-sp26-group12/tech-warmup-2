@@ -137,11 +137,53 @@
     <!-- Modals -->
     <div id="settings-modal" class="modal hidden">
         <div class="modal-content">
-            <h2>Environment Configuration</h2>
+            <h2 id="settings-title">Environment Configuration</h2>
+            
             <div class="setting-group">
-                <label>Audio Feedback</label>
+                <label id="label-language">Language</label>
+                <select id="language-select">
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                    <option value="pt">Português</option>
+                    <option value="zh">中文 (Mandarin)</option>
+                    <option value="it">Italiano</option>
+                    <option value="fr">Français</option>
+                    <option value="ja">日本語</option>
+                    <option value="ko">한국어</option>
+                    <option value="ar">العربية</option>
+                    <option value="hi">हिन्दी</option>
+                </select>
+            </div>
+
+            <div class="setting-group">
+                <label id="label-audio">Audio Feedback</label>
                 <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.5">
             </div>
+
+            <div class="setting-group">
+                <label id="label-sound-theme">Sound Theme</label>
+                <select id="sound-theme-select">
+                    <option value="ai">Default AI (Neural)</option>
+                    <option value="classic">Classic Slot (Mechanical)</option>
+                    <option value="modern">Modern Casino (Digital)</option>
+                </select>
+            </div>
+
+            <div class="setting-group">
+                <label id="label-machine-color">Cabinet Color</label>
+                <input type="color" id="machine-color-picker" value="#2a2a2a">
+            </div>
+
+            <div class="setting-group toggle-group">
+                <label id="label-mirror">Mirror Interface</label>
+                <input type="checkbox" id="mirror-toggle">
+            </div>
+
+            <div class="setting-group toggle-group">
+                <label id="label-flip">Flip Interface (Upside Down)</label>
+                <input type="checkbox" id="flip-toggle">
+            </div>
+
             <button id="close-settings" class="modal-btn">Apply & Close</button>
         </div>
     </div>
