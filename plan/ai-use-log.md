@@ -291,3 +291,20 @@ For each of the different models they should have thier own personality for the 
 **Outcome:** Successfully added a missions feature and color coded the log output to better identify outcomes.
 
 **Hand-edits:** N/A
+
+---
+## Iteration 23 - [Ensuring Code Readability and Expandability]
+
+**Prompt:** Without meaningfully changing existing logic, make sure the code follows widely accepted clean code principles, such as:
+- Meaningful names.
+- Small functions and classes.
+- Avoid duplicate code.
+- Handle errors.
+- Appropriate abstraction and modularity.
+- Be easy to update.
+
+The code should be easy for a human to read, understand, and potentially build off of and add features. Make sure to add comments where appropriate.
+
+**Outcome:** Seems to have worked, will likely take a professional to understand the changes and whether it actually contributed to the cleanliness of the code.
+
+**Hand-edits:** N/A
