@@ -204,14 +204,14 @@ For each of the different models they should have thier own personality for the 
 
 **Prompt:** Let's also change the background color of the actual site and not just the slot machine. We want the background of the site to be a moving-animated gradient of blue and purple. Do not touch anything else, we just want the background of the site to change color.
 
-**Outcome:** TBD
+**Outcome:** Did not follow just the blue and purple gradient but matched the colors based on the difficulty the user selects. For example, black to purple gradient for Gemnini while black to orange for Claude. However, the gradient works and thats all that matters.
 
-**Hand-edits:** TBD
+**Hand-edits:** No.
 
 ---
-## Iteration 14 - [---]
+## Iteration 14 - [Chat-GPT spins]
 
-**Prompt:** 
+**Prompt:** For only the Chat-GPT difficulty, we want the slot spins to end faster. So for ONLY the Chat-GPT difficulty, keep the spinning animation but end the actually spinning quicker. Do not touch the Gemini and Claude slots.
 
 **Outcome:** TBD
 
