@@ -32,7 +32,7 @@ Create a slot machine app that uses vanilla web technology like HTML, CSS, JavaS
 - Uses low bet sizes like ($0.10–$0.50).
 **What Gary wants in a slot machine**
 - **Fun lights/colors:** He doesn't want a bland and boring slot.
-> - **Themes and animations:** Being overwhelmed is nothing to him.
+- **Themes and animations:** Being overwhelmed is nothing to him.
 - **Statistics/Logs:** Add-ons that keep track of in-game things like random missions, spin streaks, something that contrast gameplay from any other slot machine in the casino.
 - **Low volatility:** Doesn't care about getting multiple wins.
  **User Stories:**
@@ -74,15 +74,15 @@ Clear code matters more than clever code — the goal is a codebase that reads a
 
 ---
 
-## Iteration 3 — [Short Title]
+## Iteration 3 — [AI Mockery Theme enforcement]
 
-**Prompt:** [exact prompt sent]
+**Prompt:** I want to enforce the idea that this slot machine app should be AI mocking. So add more stuff / symbols/ Features that would be resembling AI etc. Please add more AI themed symbols/ emojis. ALso add more AI themed AI logs so that there isnt the same chat log each time. There should be a wide variety of them. 
 
-**Outcome:** [what the AI produced / what changed]
+**Outcome:** Added more emojis representing different payouts and more robust log library
 
-**Worked / didn't work:** [brief notes]
+**Worked / didn't work:** works good
 
-**Hand-edits:** [none / what + why]
+**Hand-edits:** None
 
 ---
 

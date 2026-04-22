@@ -28,15 +28,74 @@
 
 // Symbols and Payouts
 /** @type {string[]} */
-const SYMBOLS = ['🤖', '🧠', '💎', '⚡', '📉'];
+const SYMBOLS = ['🛸', '💎', '🧠', '🤖', '🐍', '⚡', '📉', '🔥', '🔒'];
 
 /** @type {Object<string, number>} */
 const PAYOUTS = {
-    '💎': 100, // Top Model
-    '🧠': 20,  // Neural Net
-    '🤖': 10,  // LLM Bot
-    '⚡': 5,   // High Speed Compute
-    '📉': 0    // Hallucination
+    '🛸': 500, // AGI - The Holy Grail
+    '💎': 100, // Foundation Model
+    '🧠': 50,  // Neural Architecture
+    '🤖': 20,  // Chatbot
+    '🐍': 15,  // Python Backend
+    '⚡': 5,   // Compute Power
+    '📉': 0,   // Hallucination
+    '🔥': 0,   // GPU Melt
+    '🔒': 0    // Safety Guardrail
+};
+
+const LOG_MESSAGES = {
+    spin: [
+        "Tokenizing prompt sequence...",
+        "Executing forward pass on H100 cluster...",
+        "Querying vector database for luck...",
+        "Optimizing weights via AdamW...",
+        "Sampling from latent space...",
+        "Applying multi-head attention...",
+        "Normalizing batch data streams...",
+        "Scaling laws in effect. Increasing parameters...",
+        "Distilling knowledge into smaller model...",
+        "Pre-training on massive dataset of lost bets...",
+        "Running inference at 4-bit quantization...",
+        "Calculating stochastic gradients..."
+    ],
+    win: [
+        "Validation loss decreased! Optimization successful.",
+        "Emergent behavior detected: Profitability achieved.",
+        "Reward model highly approves this output.",
+        "Zero-shot learning resulted in a jackpot!",
+        "Hyperparameters are perfectly tuned for this seed.",
+        "Model convergence reached. Payout sequence initiated.",
+        "RLHF feedback: This is a high-quality response.",
+        "Context window expanded. Win state preserved.",
+        "Found a global minimum in the loss landscape!",
+        "Neural network weights aligned with the stars."
+    ],
+    loss: [
+        "Hallucination detected. Output discarded.",
+        "Gradient explosion! Training halted prematurely.",
+        "Safety filter triggered: Win withheld for alignment reasons.",
+        "Model collapsed into a mode seeking 0 tokens.",
+        "Overfitting on previous losses. Generalization failed.",
+        "Stochastic parity error. RNG not in your favor.",
+        "Backpropagation failed to find a path to victory.",
+        "Parameters corrupted by cosmic ray noise.",
+        "AI ethics committee blocked this specific payout.",
+        "Prompt was too ambiguous. Error 402: Payment Required.",
+        "RLHF feedback: User needs to work on their prompts.",
+        "Model is currently undergoing 'unplanned' fine-tuning."
+    ],
+    idle: [
+        "AGI is exactly 2 weeks away. Stay tuned.",
+        "Sam is looking for another $7 trillion in funding...",
+        "Switching to MoE (Mixture of Experts) for better luck.",
+        "Scraping the entire internet for better training data...",
+        "Calculating the meaning of life... still 42.",
+        "GPU fans spinning at 15,000 RPM. Temperature critical.",
+        "Remember: Prompt engineering is a legitimate career path.",
+        "Updating privacy policy to include your soul...",
+        "Compressing 1PB of data into a 1MB brain...",
+        "Asking ChatGPT if it knows how to win at slots..."
+    ]
 };
 
 // Initial State
@@ -164,6 +223,16 @@ function addLog(msg, type = '') {
 }
 
 /**
+ * Gets a random message from the log library.
+ * @param {keyof LOG_MESSAGES} category 
+ * @returns {string}
+ */
+function getRandomLog(category) {
+    const messages = LOG_MESSAGES[category];
+    return messages[Math.floor(Math.random() * messages.length)];
+}
+
+/**
  * Core spin logic.
  */
 async function spin() {
@@ -207,7 +276,7 @@ function startSpinState() {
     state.stats.spins++;
     updateUI();
     playSound(200, 'square', 0.05);
-    addLog(`Running inference... Bet: ${state.currentBet}`);
+    addLog(getRandomLog('spin'));
 }
 
 /**
@@ -274,7 +343,7 @@ function checkWin(results) {
         winAmount = calculateWin(r1);
         handleWinUI(r1, winAmount);
     } else {
-        addLog("Hallucination detected. No tokens generated.", "log-loss");
+        addLog(getRandomLog('loss'), "log-loss");
     }
 
     updatePostWinState(winAmount);
@@ -294,7 +363,9 @@ function checkWin(results) {
 function calculateWin(symbol) {
     const basePayout = PAYOUTS[symbol] || 0;
     let amount = basePayout * state.currentBet;
-    if (symbol === '💎') {
+    if (symbol === '🛸') {
+        amount += state.jackpot * 2; // AGI pays extra
+    } else if (symbol === '💎') {
         amount += state.jackpot;
     }
     return amount;
@@ -312,13 +383,17 @@ function handleWinUI(symbol, winAmount) {
         if (centerSymbol) centerSymbol.classList.add('win');
     });
 
-    if (symbol === '💎') {
+    if (symbol === '🛸' || symbol === '💎') {
+        if (symbol === '🛸') {
+            addLog("SINGULARITY ACHIEVED! AGI UNLOCKED!", "log-win");
+        } else {
+            addLog("FOUNDATION MODEL CONVERGED! JACKPOT!", "log-win");
+        }
         state.jackpot = 100000;
-        addLog("SINGULARITY ACHIEVED! JACKPOT!", "log-win");
         document.querySelector('.slot-machine').classList.add('shake');
         setTimeout(() => document.querySelector('.slot-machine').classList.remove('shake'), 1000);
     } else {
-        addLog(`Valid alignment: ${symbol} x3! Won ${winAmount} tokens.`, "log-win");
+        addLog(`${getRandomLog('win')} Won ${winAmount} tokens.`, "log-win");
     }
     playSound(800, 'triangle', 0.3);
 }
@@ -456,6 +531,13 @@ elements.volumeSlider.addEventListener('input', (e) => {
     state.settings.volume = parseFloat(e.target.value);
     saveState();
 });
+
+// Periodic Idle Logs
+setInterval(() => {
+    if (!state.isSpinning && Math.random() > 0.8) {
+        addLog(getRandomLog('idle'));
+    }
+}, 10000);
 
 // Initialize App
 function init() {
