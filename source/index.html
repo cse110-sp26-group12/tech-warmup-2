@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Slot Machine - GPU Token Casino</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="main-header">
+            <div class="header-left">
+                <div class="model-selector">
+                    <button class="model-btn" data-model="chatgpt">ChatGPT</button>
+                    <button class="model-btn active" data-model="gemini">Gemini</button>
+                    <button class="model-btn" data-model="claude">Claude</button>
+                </div>
+            </div>
+            
+            <div class="header-center">
+                <div id="jackpot-display" class="jackpot-container">
+                    <small>PRIORITY JACKPOT</small>
+                    <div class="jackpot-wrapper">
+                        <span id="jackpot-ticker">100,000</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <h1>AI Token Casino</h1>
+            </div>
+        </header>
+
+        <main>
+            <div class="slot-machine-container">
+                <div id="jackpot-hint" class="jackpot-hint hidden">JACKPOT: 5x 💎</div>
+                <div id="win-overlay" class="win-overlay"></div>
+                <div class="slot-machine">
+                    <div id="paylines-layer" class="paylines-layer"></div>
+                    <div class="reels-container">
+                        <div class="reel" id="reel-1">
+                            <div class="reel-strip"></div>
+                        </div>
+                        <div class="reel" id="reel-2">
+                            <div class="reel-strip"></div>
+                        </div>
+                        <div class="reel" id="reel-3">
+                            <div class="reel-strip"></div>
+                        </div>
+                        <div class="reel" id="reel-4">
+                            <div class="reel-strip"></div>
+                        </div>
+                        <div class="reel" id="reel-5">
+                            <div class="reel-strip"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <div class="tokens-display">
+                    <div class="balance-info">
+                        <span class="balance-label">Compute Balance</span>
+                        <div id="token-balance">1,000</div>
+                    </div>
+                    <button id="add-tokens-btn" class="round-btn" title="Refill Compute Credits">+</button>
+                </div>
+                <div class="bet-controls" id="bet-container">
+                    <!-- Dynamic Bet Buttons -->
+                </div>
+                <div class="action-buttons">
+                    <button id="spin-btn" class="primary-action">Spin Model</button>
+                    <button id="auto-btn" class="secondary-action">Auto-Bet</button>
+                </div>
+            </div>
+        </main>
+
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <section class="stats-container">
+                    <h3>Performance Stats</h3>
+                    <div id="game-stats">
+                        <p>Inferences: <span id="stat-spins">0</span></p>
+                        <p>Yield: <span id="stat-won">0</span></p>
+                        <p>Missions: <span id="stat-missions">0/3</span></p>
+                    </div>
+                    <h3 class="missions-header-title">Active Objectives</h3>
+                    <div id="missions-list" class="missions-list">
+                        <!-- Dynamic Missions -->
+                    </div>
+                    <button id="paytable-btn" class="info-btn">Model Architecture</button>
+                </section>
+            </div>
+            <section class="logs-container">
+                <h3>Neural Logs</h3>
+                <div id="game-logs" class="game-logs"></div>
+            </section>
+        </aside>
+
+        <footer>
+            <button id="settings-btn" class="minimal-btn">Environment Settings</button>
+        </footer>
+    </div>
+
+    <!-- Modals -->
+    <div id="settings-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="settings-title">Environment Configuration</h2>
+            
+            <div class="setting-group">
+                <label id="label-language">Language</label>
+                <select id="language-select">
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                    <option value="pt">Português</option>
+                    <option value="zh">中文 (Mandarin)</option>
+                    <option value="it">Italiano</option>
+                    <option value="fr">Français</option>
+                    <option value="ja">日本語</option>
+                    <option value="ko">한국어</option>
+                    <option value="ar">العربية</option>
+                    <option value="hi">हिन्दी</option>
+                </select>
+            </div>
+
+            <div class="setting-group">
+                <label id="label-audio">Audio Feedback</label>
+                <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.5">
+            </div>
+
+            <div class="setting-group">
+                <label id="label-sound-theme">Sound Theme</label>
+                <select id="sound-theme-select">
+                    <option value="ai">Default AI (Neural)</option>
+                    <option value="classic">Classic Slot (Mechanical)</option>
+                    <option value="modern">Modern Casino (Digital)</option>
+                </select>
+            </div>
+
+            <div class="setting-group">
+                <label id="label-machine-color">Cabinet Color</label>
+                <input type="color" id="machine-color-picker" value="#2a2a2a">
+            </div>
+
+            <div class="setting-group toggle-group">
+                <label id="label-mirror">Mirror Interface</label>
+                <input type="checkbox" id="mirror-toggle">
+            </div>
+
+            <div class="setting-group toggle-group">
+                <label id="label-flip">Flip Interface (Upside Down)</label>
+                <input type="checkbox" id="flip-toggle">
+            </div>
+
+            <button id="close-settings" class="modal-btn">Apply & Close</button>
+        </div>
+    </div>
+
+    <div id="paytable-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="paytable-title">Model Payout Structure</h2>
+            <div id="paytable-grid" class="paytable-grid">
+                <!-- Dynamic Payout List -->
+            </div>
+            <button id="close-paytable" class="modal-btn">Return to Terminal</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
